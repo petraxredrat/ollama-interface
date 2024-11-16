@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollama Interface</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/themes/prism.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        .thinking {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #4B5563;
+            color: white;
+            border-radius: 0.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .thinking.active {
+            display: flex;
+        }
+        .spinner {
+            animation: spin 1s linear infinite;
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .progress-container {
+            display: none;
+            margin-top: 1rem;
+        }
+        .custom-input {
+            background-color: white;
+            color: black;
+        }
+        .card-gray-1 { background-color: #2a2a2a; }
+        .card-gray-2 { background-color: #333333; }
+        .card-gray-3 { background-color: #383838; }
+        .card-gray-4 { background-color: #3d3d3d; }
+        
+        /* Tab Styles */
+        .tab-list {
+            display: flex;
+            overflow-x: auto;
+            border-bottom: 1px solid #4a4a4a;
+            margin-bottom: 1rem;
+        }
+        .tab {
+            padding: 0.5rem 1rem;
+            background: #2a2a2a;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            margin-right: 2px;
+            border-radius: 4px 4px 0 0;
+        }
+        .tab.active {
+            background: #383838;
+            color: white;
+            border-bottom: 2px solid #4CAF50;
+        }
+        .tab-content {
+            display: none;
+            height: 400px;
+            overflow-y: auto;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .close-tab {
+            margin-left: 8px;
+            color: #666;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        .close-tab:hover {
+            color: #ff4444;
+        }
+        .new-tab-button {
+            padding: 0.5rem 1rem;
+            background: #2a2a2a;
+            border: 1px dashed #4a4a4a;
+            color: #888;
+            cursor: pointer;
+            margin-left: 8px;
+            border-radius: 4px;
+        }
+        .new-tab-button:hover {
+            background: #383838;
+            color: white;
+        }
+        .save-button {
+            padding: 0.5rem 1rem;
+            background: #4CAF50;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-left: 8px;
+        }
+        .save-button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-full mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-white">Ollama Interface</h1>
+        
+        <div class="grid grid-cols-2 gap-8">
+                    <!-- Thinking Indicator -->
+        <div id="thinkingIndicator" class="thinking">
+            <svg class="spinner" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>AI is thinking...</span>
+        </div>
+
+        <!-- Message Display -->
+        <div id="message" class="fixed top-4 right-4 p-4 rounded shadow-lg hidden"></div>
+            <!-- Left Column -->
+            <div class="space-y-6">
+                <!-- Model Selection -->
+                <div class="card-gray-1 p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-semibold mb-4 text-white">Model Selection</h2>
+                    <select id="modelSelect" class="w-full p-2 bg-gray-800 text-white rounded">
+                        <option value="">Select a model...</option>
+                    </select>
+                    <div class="mt-4 flex items-center space-x-4">
+                        <button onclick="downloadModel()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Download Model</button>
+                        <div class="flex items-center space-x-2">
+                            <span id="modelType" class="text-gray-300">💬 Chat</span>
+                            <span id="imageCapable" class="hidden text-blue-400">📸</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Upload Area -->
+                <div id="imageUploadArea" class="card-gray-2 p-6 rounded-lg shadow-lg mt-4" style="display: none;">
+                    <h2 class="text-xl font-semibold mb-4 text-white">Image Upload</h2>
+                    <div class="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center">
+                        <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)" class="hidden">
+                        <label for="imageInput" class="cursor-pointer text-gray-300 hover:text-white">
+                            Click to upload an image or drag and drop
+                        </label>
+                    </div>
+                    <div id="imagePreview" class="mt-4 hidden">
+                        <img id="uploadedImage" class="max-w-full h-auto rounded-lg">
+                        <button onclick="removeImage()" class="mt-2 text-red-500 hover:text-red-600">Remove Image</button>
+                    </div>
+                </div>
+
+                <!-- Code Generation -->
+                <div class="card-gray-3 p-6 rounded-lg shadow-lg" id="codeSection">
+                    <h2 class="text-xl font-semibold mb-4 text-white">Code Generation</h2>
+                    <textarea id="codeInput" class="w-full h-32 p-2 border rounded mb-4 custom-input" placeholder="Describe the code you want to generate..."></textarea>
+                    <button onclick="generateCode()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Generate</button>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- Preview with Tabs -->
+                <div class="card-gray-4 p-6 rounded-lg shadow-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-white">Preview</h2>
+                        <div class="flex items-center">
+                            <button onclick="checkAllFiles()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">Check Files</button>
+                            <button onclick="saveAllFiles()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Save All</button>
+                        </div>
+                    </div>
+                    <div id="tabs" class="tab-list">
+                        <button class="new-tab-button" onclick="addNewTab()">+ New File</button>
+                    </div>
+                    <div id="file-contents">
+                        <!-- Tab contents will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Section -->
+        <div class="mt-8" id="chatSection">
+            <div class="card-gray-1 p-6 rounded-lg shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-white">Chat</h2>
+                <div id="chatMessages"></div>
+                <div class="flex items-center bg-black rounded-lg px-2">
+                    <input type="text" id="userInput" class="flex-1 p-2 bg-black text-white border-none focus:outline-none font-mono" placeholder="Type a message...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Command Terminal (At Bottom) -->
+        <div class="mt-8">
+            <div class="card-gray-1 p-6 rounded-lg shadow-lg">
+                <h2 class="text-xl font-semibold mb-4 text-white">Command Prompt</h2>
+                <div class="bg-black p-4 rounded-lg mb-4 h-[32rem] overflow-y-auto font-mono text-sm" id="terminalOutput">
+                    <div class="text-white">Microsoft Windows [Version 10.0.19045.3803]</div>
+                    <div class="text-white">Copyright (c) Microsoft Corporation. All rights reserved.</div>
+                    <div class="text-white mb-2" id="currentPath"></div>
+                </div>
+                <div class="flex items-center bg-black rounded-lg px-2">
+                    <span class="text-white mr-2" id="currentPathSpan"></span>
+                    <input type="text" id="cmdInput" 
+                           class="flex-1 p-2 bg-black text-white border-none focus:outline-none font-mono" 
+                           placeholder=""
+                           onkeydown="handleCommandInput(event)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/prism.js"></script>
+    <script>
+        let currentImageData = null;
+        let isMultimodalModel = false;
+        let isCodeModel = false;
+
+        // Function to add message to chat
+        function addMessageToChat(role, content) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `mb-4 ${role === 'user' ? 'text-right' : 'text-left'}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = `inline-block p-3 rounded-lg ${role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-white'}`;
+            
+            // Handle code blocks in the content
+            const formattedContent = content.replace(/```([\s\S]*?)```/g, (match, code) => {
+                return `<pre><code class="language-${code.split('\n')[0] || 'plaintext'}">${code}</code></pre>`;
+            });
+            
+            bubble.innerHTML = formattedContent;
+            messageDiv.appendChild(bubble);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Highlight code blocks
+            Prism.highlightAll();
+        }
+
+        // Function to show/hide thinking indicator
+        function showThinking(show) {
+            const indicator = document.getElementById('thinkingIndicator');
+            indicator.style.display = show ? 'block' : 'none';
+        }
+
+        // Function to show message
+function showMessage(message, type = 'info') {
+    const messageDiv = document.getElementById('message');
+    if (!messageDiv) {
+        console.error('Message div not found');
+        return;
+    }
+    messageDiv.textContent = message;
+    messageDiv.className = `fixed top-4 right-4 p-4 rounded shadow-lg ${
+        type === 'error' ? 'bg-red-500' : 'bg-green-500'
+    } text-white`;
+    messageDiv.style.display = 'block';
+    setTimeout(() => {
+        messageDiv.style.display = 'none';
+    }, 3000);
+}
+
+        // Function to handle image upload
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewDiv = document.getElementById('imagePreview');
+                const previewImg = document.getElementById('uploadedImage');
+                currentImageData = e.target.result.split(',')[1]; // Store base64 data
+                previewImg.src = e.target.result;
+                previewDiv.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Function to remove uploaded image
+        function removeImage() {
+            const previewDiv = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('uploadedImage');
+            currentImageData = null;
+            previewImg.src = '';
+            previewDiv.style.display = 'none';
+            document.getElementById('imageInput').value = '';
+        }
+
+        // Function to send message
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // Add user message to chat
+            addMessageToChat('user', message);
+            userInput.value = '';
+
+            try {
+                showThinking(true);
+                const requestData = {
+                    message: message,
+                    model: document.getElementById('modelSelect').value
+                };
+
+                if (currentImageData && isMultimodalModel) {
+                    requestData.image = currentImageData;
+                }
+
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const data = await response.json();
+                if (data.error) {
+                    showMessage(data.error, 'error');
+                    return;
+                }
+
+                // Add assistant's response to chat
+                addMessageToChat('assistant', data.response);
+
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            } finally {
+                showThinking(false);
+            }
+        }
+
+        // Function to load models
+        async function loadModels() {
+            const select = document.getElementById('modelSelect');
+            select.innerHTML = '<option value="">Loading models...</option>';
+            select.disabled = true;
+            
+            try {
+                // First check if Ollama is running
+                const checkResponse = await fetch('/check_ollama');
+                const checkResult = await checkResponse.json();
+                
+                if (checkResult.error) {
+                    throw new Error(checkResult.error);
+                }
+                
+                console.log('Loading models...');
+                const response = await fetch('/list_models');
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch models: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Models data:', data);
+
+                select.innerHTML = '<option value="">Select a model...</option>';
+                
+                if (data.models && Array.isArray(data.models) && data.models.length > 0) {
+                    data.models.sort((a, b) => a.name.localeCompare(b.name));
+                    
+                    data.models.forEach(model => {
+                        const option = document.createElement('option');
+                        option.value = model.name;
+                        option.textContent = model.name;
+                        select.appendChild(option);
+                    });
+                    
+                    if (select.options.length > 1) {
+                        select.selectedIndex = 1;
+                    }
+                    
+                    checkModelCapabilities();
+                    showMessage('Models loaded successfully', 'success');
+                } else {
+                    throw new Error('No models available');
+                }
+            } catch (error) {
+                console.error('Error loading models:', error);
+                select.innerHTML = '<option value="">Error loading models</option>';
+                showMessage(error.message, 'error');
+                
+                // Add a retry button
+                const retryBtn = document.createElement('button');
+                retryBtn.textContent = 'Retry';
+                retryBtn.className = 'ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600';
+                retryBtn.onclick = loadModels;
+                select.parentNode.appendChild(retryBtn);
+            } finally {
+                select.disabled = false;
+            }
+        }
+
+        // Function to download model
+        async function downloadModel() {
+            const select = document.getElementById('modelSelect');
+            const model = select.value;
+            
+            if (!model) {
+                showMessage('Please select a model first', 'error');
+                return;
+            }
+
+            const downloadBtn = document.querySelector('button[onclick="downloadModel()"]');
+            downloadBtn.disabled = true;
+            downloadBtn.innerHTML = '<span class="loading">Downloading 0%</span>';
+            showThinking(true);
+            
+            try {
+                console.log('Loading model:', model);
+                const response = await fetch('/pull_model', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ model: model })
+                });
+
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Failed to load model');
+                }
+
+                // Update progress based on total downloaded
+                if (result.total_downloaded) {
+                    downloadBtn.innerHTML = `<span class="loading">Downloaded ${result.total_downloaded}%</span>`;
+                }
+
+                showMessage(result.message || 'Model loaded successfully!', 'success');
+                
+                // Refresh model capabilities after successful download
+                await checkModelCapabilities();
+                
+            } catch (error) {
+                console.error('Error loading model:', error);
+                showMessage(error.message, 'error');
+                
+                // Add retry button if failed
+                downloadBtn.innerHTML = 'Retry Download';
+                downloadBtn.onclick = () => {
+                    downloadBtn.innerHTML = 'Download Model';
+                    downloadBtn.onclick = downloadModel;
+                    downloadModel();
+                };
+            } finally {
+                showThinking(false);
+                if (downloadBtn.innerHTML.includes('Downloading')) {
+                    downloadBtn.disabled = false;
+                    downloadBtn.innerHTML = 'Download Model';
+                }
+            }
+        }
+
+        // Function to check model capabilities
+        function checkModelCapabilities() {
+            const model = document.getElementById('modelSelect').value;
+            const imageUploadArea = document.getElementById('imageUploadArea');
+            const modelType = document.getElementById('modelType');
+            const imageCapable = document.getElementById('imageCapable');
+
+            console.log('Checking capabilities for model:', model);
+
+            isMultimodalModel = model.toLowerCase().includes('llava');
+            isCodeModel = model.toLowerCase().includes('code') || model.toLowerCase().includes('codellama');
+
+            // Update UI based on model type
+            if (isMultimodalModel) {
+                modelType.textContent = '💬 Chat + Images';
+                imageUploadArea.style.display = 'block';
+                imageCapable.style.display = 'inline';
+                console.log('Multimodal model detected');
+            } else if (isCodeModel) {
+                modelType.textContent = '🖥️ Code Generation';
+                imageUploadArea.style.display = 'none';
+                imageCapable.style.display = 'none';
+                console.log('Code model detected');
+            } else {
+                modelType.textContent = '💬 Chat';
+                imageUploadArea.style.display = 'none';
+                imageCapable.style.display = 'none';
+                console.log('Chat model detected');
+            }
+        }
+
+        // Command line functionality
+        async function handleCommandInput(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                const cmdInput = document.getElementById('cmdInput');
+                const command = cmdInput.value.trim();
+                if (!command) return;
+
+                const terminalOutput = document.getElementById('terminalOutput');
+                
+                // Add command to output
+                const cmdLine = document.createElement('div');
+                cmdLine.className = 'text-white';
+                cmdLine.textContent = `> ${command}`;
+                terminalOutput.appendChild(cmdLine);
+                
+                try {
+                    const response = await fetch('/execute_command', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ command: command })
+                    });
+
+                    const result = await response.json();
+                    
+                    // Add command output to terminal
+                    const outputLine = document.createElement('div');
+                    outputLine.className = 'text-white whitespace-pre-wrap';
+                    outputLine.textContent = result.output || '';
+                    terminalOutput.appendChild(outputLine);
+                    
+                    // Show error if any
+                    if (result.error) {
+                        const errorLine = document.createElement('div');
+                        errorLine.className = 'text-red-500';
+                        errorLine.textContent = result.error;
+                        terminalOutput.appendChild(errorLine);
+                    }
+                    
+                    // Update current path if provided
+                    if (result.cwd) {
+                        document.getElementById('currentPathSpan').textContent = result.cwd + '>';
+                    }
+                } catch (error) {
+                    const errorLine = document.createElement('div');
+                    errorLine.className = 'text-red-500';
+                    errorLine.textContent = 'Error executing command: ' + error.message;
+                    terminalOutput.appendChild(errorLine);
+                }
+                
+                // Clear input and scroll to bottom
+                cmdInput.value = '';
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+        }
+
+        // Initialize when document is ready
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Document loaded, initializing...');
+            
+            // Initialize UI elements
+            const currentPathSpan = document.getElementById('currentPathSpan');
+            const modelSelect = document.getElementById('modelSelect');
+            const userInput = document.getElementById('userInput');
+            const cmdInput = document.getElementById('cmdInput');
+            
+            if (!currentPathSpan || !modelSelect || !userInput || !cmdInput) {
+                console.error('Required UI elements not found');
+                return;
+            }
+            
+            // Get current working directory
+            try {
+                const cwdResponse = await fetch('/get_cwd');
+                if (!cwdResponse.ok) {
+                    throw new Error(`HTTP error! status: ${cwdResponse.status}`);
+                }
+                const cwdData = await cwdResponse.json();
+                if (cwdData.cwd) {
+                    currentPathSpan.textContent = cwdData.cwd + '>';
+                }
+            } catch (error) {
+                console.error('Error getting CWD:', error);
+                currentPathSpan.textContent = 'C:\\>';
+            }
+            
+            // Load models with retry
+            try {
+                await loadModels();
+            } catch (error) {
+                console.error('Error loading models:', error);
+                showMessage('Failed to load models. Please check if Ollama is running.', 'error');
+                
+                // Add retry button
+                if (modelSelect) {
+                    modelSelect.innerHTML = '<option value="">Error loading models</option>';
+                    const retryBtn = document.createElement('button');
+                    retryBtn.textContent = 'Retry';
+                    retryBtn.className = 'ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600';
+                    retryBtn.onclick = loadModels;
+                    modelSelect.parentNode.appendChild(retryBtn);
+                }
+            }
+            
+            // Add event listeners
+            modelSelect.addEventListener('change', checkModelCapabilities);
+            
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            cmdInput.addEventListener('keydown', handleCommandInput);
+            
+            console.log('Initialization complete');
+        });
+    </script>
+</body>
+</html>
