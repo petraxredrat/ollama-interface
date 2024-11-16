@@ -1,46 +1,39 @@
 # Ollama Interface
 
-A modern web interface for interacting with Ollama models, featuring:
+A web interface for interacting with Ollama AI models, featuring code generation, chat functionality, and multimodal capabilities.
 
-- 🤖 Multiple model support
-- 💬 Chat interface
-- 🖼️ Image analysis (for supported models)
-- 💻 Code generation
-- 🔧 Command-line interface
+## Features
+
+- 🤖 Dynamic model loading and capability detection
+- 💬 Interactive chat interface with image support
+- 📝 Code generation with syntax highlighting
+- 📁 File management and organization
+- 🎨 Modern, responsive UI
 
 ## Prerequisites
 
-- Python 3.8+
-- Ollama installed and running
-- Web browser
+- Python 3.8 or higher
+- Ollama installed and running locally
 
 ## Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/ollama-interface.git
+git clone https://github.com/petraxredrat/ollama-interface.git
 cd ollama-interface
 ```
 
-2. Install dependencies:
+2. Create and activate a virtual environment:
+```bash
+python -m venv venv
+venv\Scripts\activate  # Windows
+source venv/bin/activate  # Linux/Mac
+```
+
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
-
-3. Run the application:
-```bash
-python run.py
-```
-
-4. Open your browser and navigate to `http://localhost:5000`
-
-## Features
-
-- **Model Selection**: Choose from available Ollama models
-- **Chat Interface**: Interactive chat with the selected model
-- **Code Generation**: Generate code with specialized coding models
-- **Image Analysis**: Upload and analyze images with multimodal models
-- **Command Terminal**: Execute system commands directly from the interface
 
 ## Usage
 
@@ -49,18 +42,33 @@ python run.py
 ollama serve
 ```
 
-2. Launch the web interface:
+2. Run the application:
 ```bash
 python run.py
 ```
 
-3. Select a model from the dropdown menu
-4. Start chatting, generating code, or analyzing images
+3. Open your browser and navigate to:
+```
+http://localhost:5000
+```
 
-## Contributing
+## Project Structure
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+```
+ollama-interface/
+├── app/
+│   ├── __init__.py
+│   ├── routes.py
+│   ├── static/
+│   │   └── favicon.ico
+│   └── templates/
+│       └── index.html
+├── requirements.txt
+├── run.py
+├── .gitignore
+└── README.md
+```
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT License

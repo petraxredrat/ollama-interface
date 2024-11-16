@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ollama Interface</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/themes/prism.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
     <style>
         body {
             background-color: #1a1a1a;
@@ -46,7 +48,13 @@
         .card-gray-1 { background-color: #2a2a2a; }
         .card-gray-2 { background-color: #333333; }
         .card-gray-3 { background-color: #383838; }
-        .card-gray-4 { background-color: #3d3d3d; }
+        .card-gray-4 { background-color: #8B0000; }
+        
+        /* Ensure text is readable on red background */
+        .card-gray-4 h2 {
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
         
         /* Tab Styles */
         .tab-list {
@@ -54,6 +62,7 @@
             overflow-x: auto;
             border-bottom: 1px solid #4a4a4a;
             margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
         }
         .tab {
             padding: 0.5rem 1rem;
@@ -63,6 +72,9 @@
             cursor: pointer;
             margin-right: 2px;
             border-radius: 4px 4px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         .tab.active {
             background: #383838;
@@ -71,11 +83,65 @@
         }
         .tab-content {
             display: none;
-            height: 400px;
+            height: 70vh;
             overflow-y: auto;
+            background: #1e1e1e;
+            border-radius: 8px;
+            position: relative;
+            width: 100%;
         }
         .tab-content.active {
             display: block;
+        }
+        .code-container {
+            position: relative;
+            font-family: 'Fira Code', monospace;
+            line-height: 1.5;
+            padding: 1rem;
+            min-height: 100%;
+            width: 100%;
+            max-width: none;
+            overflow-x: auto;
+        }
+        .line-numbers {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3rem;
+            padding: 1rem 0.5rem;
+            border-right: 1px solid #333;
+            color: #666;
+            text-align: right;
+            user-select: none;
+        }
+        .code-content {
+            margin-left: 3.5rem;
+            padding-left: 1rem;
+            white-space: pre;
+            tab-size: 4;
+        }
+        .copy-button {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            background: #2a2a2a;
+            border: 1px solid #4a4a4a;
+            color: #888;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .copy-button:hover {
+            background: #383838;
+            color: white;
+        }
+        .copy-button svg {
+            width: 1rem;
+            height: 1rem;
         }
         .close-tab {
             margin-left: 8px;
@@ -112,6 +178,117 @@
         .save-button:hover {
             background: #45a049;
         }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0;
+            overflow-x: auto;
+        }
+        code {
+            display: block;
+            min-height: 100%;
+            white-space: pre;
+            tab-size: 4;
+            width: 100% !important;
+            max-width: none !important;
+        }
+        .grid-cols-2 {
+            grid-template-columns: 300px 1fr !important;
+            gap: 2rem;
+        }
+        
+        /* File list styling */
+        #fileList {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            background: #2d2d2d;
+            border-radius: 0.375rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .file-item:hover {
+            background: #3d3d3d;
+            transform: translateX(4px);
+        }
+        
+        .file-icon {
+            margin-right: 0.75rem;
+            color: #6B7280;
+        }
+        
+        .file-name {
+            flex-grow: 1;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .file-type {
+            padding: 0.25rem 0.5rem;
+            background: #4B5563;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            margin-left: 0.75rem;
+        }
+        
+        .file-size {
+            color: #9CA3AF;
+            font-size: 0.75rem;
+            margin-left: 0.75rem;
+        }
+        
+        /* Make code area wider */
+        .grid-cols-2 {
+            grid-template-columns: 300px 1fr !important;
+            gap: 2rem;
+        }
+        
+        /* Ensure code container takes full width */
+        .code-container {
+            position: relative;
+            font-family: 'Fira Code', monospace;
+            line-height: 1.5;
+            padding: 1rem;
+            min-height: 100%;
+            width: 100%;
+            max-width: none;
+        }
+        
+        /* Make pre/code blocks take full width */
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0;
+            overflow-x: auto;
+        }
+        
+        code {
+            width: 100% !important;
+            max-width: none !important;
+            display: block;
+        }
+        
+        /* Ensure preview area takes full width */
+        .card-gray-4 {
+            width: 100%;
+            max-width: none;
+        }
+        
+        /* Make tab content take full width */
+        .tab-content {
+            width: 100% !important;
+            max-width: none !important;
+        }
     </style>
 </head>
 <body class="p-8">
@@ -133,18 +310,33 @@
             <!-- Left Column -->
             <div class="space-y-6">
                 <!-- Model Selection -->
+                <div class="mb-4">
+                    <h2 class="text-xl font-semibold mb-2">Model Selection</h2>
+                    <select id="modelSelect" class="w-full p-2 bg-gray-700 text-white rounded"></select>
+                    <div id="modelStatus" class="mt-2 text-sm">
+                        <span id="chatCapable" class="hidden mr-2 px-2 py-1 bg-green-500 text-white rounded">Chat</span>
+                        <span id="codeCapable" class="hidden mr-2 px-2 py-1 bg-blue-500 text-white rounded">Code</span>
+                        <span id="imageCapable" class="hidden mr-2 px-2 py-1 bg-purple-500 text-white rounded">Image</span>
+                    </div>
+                </div>
+
+                <!-- Generated Files Browser -->
                 <div class="card-gray-1 p-6 rounded-lg shadow-lg">
-                    <h2 class="text-xl font-semibold mb-4 text-white">Model Selection</h2>
-                    <select id="modelSelect" class="w-full p-2 bg-gray-800 text-white rounded">
-                        <option value="">Select a model...</option>
-                    </select>
-                    <div class="mt-4 flex items-center space-x-4">
-                        <button onclick="downloadModel()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Download Model</button>
-                        <div class="flex items-center space-x-2">
-                            <span id="modelType" class="text-gray-300">💬 Chat</span>
-                            <span id="imageCapable" class="hidden text-blue-400">📸</span>
+                    <h2 class="text-xl font-semibold mb-4">Generated Files</h2>
+                    <div id="fileList" class="space-y-2"></div>
+                </div>
+
+                <!-- Code Editor -->
+                <div class="card-gray-1 p-6 rounded-lg shadow-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold">Code Editor</h2>
+                        <div class="space-x-2">
+                            <button onclick="fixCurrentCode()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Fix Code</button>
+                            <button onclick="saveAllFiles()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Save All</button>
                         </div>
                     </div>
+                    <div class="tab-list"></div>
+                    <div id="tabContents" class="relative"></div>
                 </div>
 
                 <!-- Image Upload Area -->
@@ -165,8 +357,17 @@
                 <!-- Code Generation -->
                 <div class="card-gray-3 p-6 rounded-lg shadow-lg" id="codeSection">
                     <h2 class="text-xl font-semibold mb-4 text-white">Code Generation</h2>
-                    <textarea id="codeInput" class="w-full h-32 p-2 border rounded mb-4 custom-input" placeholder="Describe the code you want to generate..."></textarea>
-                    <button onclick="generateCode()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Generate</button>
+                    <div class="flex space-x-4 mb-4">
+                        <textarea id="codeInput" class="w-full h-32 p-2 border rounded custom-input" placeholder="Describe the code you want to generate or the error you want to fix..."></textarea>
+                    </div>
+                    <div class="flex space-x-2 mb-4">
+                        <button onclick="generateCode()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Generate New</button>
+                        <button onclick="fixCurrentCode()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Fix Current Code</button>
+                    </div>
+                    <div id="tabContents" class="mt-4"></div>
+                    <div class="tab-list">
+                        <button class="new-tab-button" onclick="addNewTab()">+ New File</button>
+                    </div>
                 </div>
             </div>
 
@@ -182,7 +383,6 @@
                         </div>
                     </div>
                     <div id="tabs" class="tab-list">
-                        <button class="new-tab-button" onclick="addNewTab()">+ New File</button>
                     </div>
                     <div id="file-contents">
                         <!-- Tab contents will be added here dynamically -->
@@ -195,9 +395,22 @@
         <div class="mt-8" id="chatSection">
             <div class="card-gray-1 p-6 rounded-lg shadow-lg">
                 <h2 class="text-xl font-semibold mb-4 text-white">Chat</h2>
-                <div id="chatMessages"></div>
-                <div class="flex items-center bg-black rounded-lg px-2">
-                    <input type="text" id="userInput" class="flex-1 p-2 bg-black text-white border-none focus:outline-none font-mono" placeholder="Type a message...">
+                <div id="chatMessages" class="space-y-4 mb-4 h-96 overflow-y-auto"></div>
+                <div class="flex flex-col space-y-2">
+                    <div id="imagePreviewInChat" class="hidden">
+                        <img id="chatImagePreview" class="max-h-48 rounded-lg mb-2">
+                        <button onclick="removeImageFromChat()" class="text-red-500 hover:text-red-600 text-sm">Remove Image</button>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="flex-1 flex items-center bg-black rounded-lg px-2">
+                            <input type="text" id="userInput" class="flex-1 p-2 bg-black text-white border-none focus:outline-none font-mono" placeholder="Type a message...">
+                        </div>
+                        <label for="chatImageUpload" class="cursor-pointer p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            📷
+                        </label>
+                        <input type="file" id="chatImageUpload" accept="image/*" class="hidden" onchange="handleChatImageUpload(event)">
+                        <button onclick="sendMessage()" class="p-2 bg-green-500 text-white rounded hover:bg-green-600">Send</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -222,33 +435,192 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/prism.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-markup.min.js"></script>
+    
     <script>
         let currentImageData = null;
         let isMultimodalModel = false;
         let isCodeModel = false;
+        let downloadCounter = 0;
 
-        // Function to add message to chat
-        function addMessageToChat(role, content) {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `mb-4 ${role === 'user' ? 'text-right' : 'text-left'}`;
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Document loaded, initializing...');
+            await loadModels();
+            await loadGeneratedFiles();
+            console.log('Initialization complete');
+        });
+
+        // Function to detect file type and return appropriate language class
+        function getLanguageClass(fileName) {
+            if (!fileName) return 'plaintext';
+            const parts = fileName.split('.');
+            if (parts.length < 2) return 'plaintext';
             
-            const bubble = document.createElement('div');
-            bubble.className = `inline-block p-3 rounded-lg ${role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-white'}`;
-            
-            // Handle code blocks in the content
-            const formattedContent = content.replace(/```([\s\S]*?)```/g, (match, code) => {
-                return `<pre><code class="language-${code.split('\n')[0] || 'plaintext'}">${code}</code></pre>`;
+            const ext = parts.pop().toLowerCase();
+            const langMap = {
+                'py': 'python',
+                'js': 'javascript',
+                'html': 'html',
+                'css': 'css',
+                'json': 'json',
+                'md': 'markdown',
+                'txt': 'plaintext'
+            };
+            return langMap[ext] || 'plaintext';
+        }
+
+        // Function to check all files
+        function checkAllFiles() {
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => {
+                if (input.files.length > 0) {
+                    const file = input.files[0];
+                    console.log(`File ${file.name} selected`);
+                }
             });
+        }
+
+        // Function to download code with proper MIME types
+        function downloadCode(tabId) {
+            const tab = tabs.get(tabId);
+            if (tab) {
+                downloadCounter++;
+                const mimeTypes = {
+                    'python': 'text/x-python',
+                    'javascript': 'text/javascript',
+                    'html': 'text/html',
+                    'css': 'text/css',
+                    'json': 'application/json',
+                    'plaintext': 'text/plain'
+                };
+
+                const mimeType = mimeTypes[tab.language] || 'text/plain';
+                const blob = new Blob([tab.content], { type: mimeType });
+                const url = window.URL.createObjectURL(blob);
+                
+                // Create download link with security attributes
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = tab.fileName;
+                a.rel = 'noopener noreferrer';
+                a.setAttribute('data-downloadid', `safe-download-${downloadCounter}`);
+                
+                // Add to page temporarily and trigger download
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+            }
+        }
+
+        // Function to save to project with proper error handling
+        async function saveToProject(tabId) {
+            const tab = tabs.get(tabId);
+            if (!tab) {
+                throw new Error('Tab not found');
+            }
+
+            // Get the content from the pre element
+            const content = tab.editor.textContent || tab.editor.innerText;
             
-            bubble.innerHTML = formattedContent;
-            messageDiv.appendChild(bubble);
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-            
-            // Highlight code blocks
-            Prism.highlightAll();
+            try {
+                const response = await fetch(window.location.origin + '/save_code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fileName: tab.fileName,
+                        content: content,
+                        language: tab.language
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save file');
+                }
+
+                showMessage('File saved successfully!', 'success');
+            } catch (error) {
+                console.error('Save error:', error);
+                showMessage('Error saving file: ' + error.message, 'error');
+                throw error;
+            }
+        }
+
+        // Function to fix specific tab's code
+        async function fixCode(tabId) {
+            const tab = tabs.get(tabId);
+            if (!tab) {
+                showMessage('Error: Could not find tab data', 'error');
+                return;
+            }
+
+            showThinking(true);
+            try {
+                const content = tab.editor.textContent || tab.editor.innerText;
+                if (!content) {
+                    throw new Error('No code to fix');
+                }
+
+                const response = await fetch(window.location.origin + '/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt: `Fix this code and explain what was wrong. Only output the fixed code between \`\`\` markers:\n\n${content}`,
+                        model: document.getElementById('modelSelect').value
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fix code');
+                }
+
+                const data = await response.json();
+                if (!data.response) {
+                    throw new Error('No response from AI');
+                }
+
+                // Extract the fixed code from the response
+                const fixedCode = extractCodeFromResponse(data.response);
+                if (fixedCode) {
+                    // Update the current tab's content
+                    tab.editor.textContent = fixedCode;
+                    
+                    // Re-highlight the code
+                    Prism.highlightElement(tab.editor);
+                    
+                    // Save the changes
+                    await saveToProject(tabId);
+                    
+                    showMessage('Code fixed and saved successfully!', 'success');
+                    // Add the explanation to chat messages
+                    const chatMessages = document.getElementById('chatMessages');
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'message assistant bg-gray-700 p-2 rounded';
+                    messageDiv.textContent = data.response;
+                    chatMessages.appendChild(messageDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } else {
+                    showMessage('No code fixes found in the response', 'warning');
+                }
+            } catch (error) {
+                console.error('Error fixing code:', error);
+                showMessage('Error fixing code: ' + error.message, 'error');
+            } finally {
+                showThinking(false);
+            }
         }
 
         // Function to show/hide thinking indicator
@@ -304,45 +676,90 @@ function showMessage(message, type = 'info') {
         async function sendMessage() {
             const userInput = document.getElementById('userInput');
             const message = userInput.value.trim();
-            if (!message) return;
+            
+            if (!message && !currentImageData) return;
+            
+            const model = document.getElementById('modelSelect').value;
+            if (!model) {
+                showMessage('Please select a model first', 'error');
+                return;
+            }
 
             // Add user message to chat
-            addMessageToChat('user', message);
+            if (message) {
+                addMessageToChat('user', message);
+            }
+            
+            // Add image to chat if present
+            if (currentImageData) {
+                const imgElement = document.createElement('img');
+                imgElement.src = document.getElementById('chatImagePreview').src;
+                imgElement.className = 'max-h-48 rounded-lg mt-2';
+                const lastMessage = document.getElementById('chatMessages').lastElementChild;
+                if (lastMessage) {
+                    lastMessage.appendChild(imgElement);
+                }
+            }
+
             userInput.value = '';
+            showThinking(true);
 
             try {
-                showThinking(true);
-                const requestData = {
-                    message: message,
-                    model: document.getElementById('modelSelect').value
-                };
-
-                if (currentImageData && isMultimodalModel) {
-                    requestData.image = currentImageData;
-                }
-
-                const response = await fetch('/generate', {
+                const response = await fetch(window.location.origin + '/generate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(requestData)
+                    body: JSON.stringify({
+                        model: model,
+                        prompt: message,
+                        image: currentImageData
+                    })
                 });
 
-                const data = await response.json();
-                if (data.error) {
-                    showMessage(data.error, 'error');
-                    return;
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                // Add assistant's response to chat
+                const data = await response.json();
                 addMessageToChat('assistant', data.response);
-
+                
+                // Clear image after sending
+                if (currentImageData) {
+                    removeImageFromChat();
+                }
             } catch (error) {
-                showMessage('Error: ' + error.message, 'error');
+                console.error('Error:', error);
+                showMessage('Error sending message: ' + error.message, 'error');
             } finally {
                 showThinking(false);
             }
+        }
+
+        // Function to handle image upload in chat
+        async function handleChatImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewDiv = document.getElementById('imagePreviewInChat');
+                const previewImg = document.getElementById('chatImagePreview');
+                currentImageData = e.target.result.split(',')[1];
+                previewImg.src = e.target.result;
+                previewDiv.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Function to remove image from chat
+        function removeImageFromChat() {
+            const previewDiv = document.getElementById('imagePreviewInChat');
+            const previewImg = document.getElementById('chatImagePreview');
+            currentImageData = null;
+            previewImg.src = '';
+            previewDiv.classList.add('hidden');
+            document.getElementById('chatImageUpload').value = '';
         }
 
         // Function to load models
@@ -353,15 +770,14 @@ function showMessage(message, type = 'info') {
             
             try {
                 // First check if Ollama is running
-                const checkResponse = await fetch('/check_ollama');
-                const checkResult = await checkResponse.json();
-                
-                if (checkResult.error) {
-                    throw new Error(checkResult.error);
+                const checkResponse = await fetch(window.location.origin + '/check_ollama');
+                if (!checkResponse.ok) {
+                    const checkResult = await checkResponse.json();
+                    throw new Error(checkResult.error || 'Ollama server is not responding');
                 }
                 
                 console.log('Loading models...');
-                const response = await fetch('/list_models');
+                const response = await fetch(window.location.origin + '/list_models');
                 
                 if (!response.ok) {
                     throw new Error(`Failed to fetch models: ${response.statusText}`);
@@ -389,18 +805,25 @@ function showMessage(message, type = 'info') {
                     checkModelCapabilities();
                     showMessage('Models loaded successfully', 'success');
                 } else {
-                    throw new Error('No models available');
+                    throw new Error('No models available. Please download a model first.');
                 }
             } catch (error) {
                 console.error('Error loading models:', error);
                 select.innerHTML = '<option value="">Error loading models</option>';
                 showMessage(error.message, 'error');
                 
-                // Add a retry button
+                // Add a retry button with more context
                 const retryBtn = document.createElement('button');
-                retryBtn.textContent = 'Retry';
+                retryBtn.textContent = 'Retry Loading Models';
                 retryBtn.className = 'ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600';
                 retryBtn.onclick = loadModels;
+                
+                // Remove any existing retry button before adding a new one
+                const existingRetryBtn = select.parentNode.querySelector('button');
+                if (existingRetryBtn) {
+                    existingRetryBtn.remove();
+                }
+                
                 select.parentNode.appendChild(retryBtn);
             } finally {
                 select.disabled = false;
@@ -411,7 +834,7 @@ function showMessage(message, type = 'info') {
         async function downloadModel() {
             const select = document.getElementById('modelSelect');
             const model = select.value;
-            
+
             if (!model) {
                 showMessage('Please select a model first', 'error');
                 return;
@@ -421,10 +844,10 @@ function showMessage(message, type = 'info') {
             downloadBtn.disabled = true;
             downloadBtn.innerHTML = '<span class="loading">Downloading 0%</span>';
             showThinking(true);
-            
+
             try {
                 console.log('Loading model:', model);
-                const response = await fetch('/pull_model', {
+                const response = await fetch(window.location.origin + '/pull_model', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -470,33 +893,561 @@ function showMessage(message, type = 'info') {
 
         // Function to check model capabilities
         function checkModelCapabilities() {
-            const model = document.getElementById('modelSelect').value;
-            const imageUploadArea = document.getElementById('imageUploadArea');
-            const modelType = document.getElementById('modelType');
+            const model = document.getElementById('modelSelect').value.toLowerCase();
+            const modelStatus = document.getElementById('modelStatus');
+            const chatCapable = document.getElementById('chatCapable');
+            const codeCapable = document.getElementById('codeCapable');
             const imageCapable = document.getElementById('imageCapable');
-
-            console.log('Checking capabilities for model:', model);
-
-            isMultimodalModel = model.toLowerCase().includes('llava');
-            isCodeModel = model.toLowerCase().includes('code') || model.toLowerCase().includes('codellama');
-
-            // Update UI based on model type
-            if (isMultimodalModel) {
-                modelType.textContent = '💬 Chat + Images';
-                imageUploadArea.style.display = 'block';
-                imageCapable.style.display = 'inline';
-                console.log('Multimodal model detected');
-            } else if (isCodeModel) {
-                modelType.textContent = '🖥️ Code Generation';
-                imageUploadArea.style.display = 'none';
-                imageCapable.style.display = 'none';
-                console.log('Code model detected');
-            } else {
-                modelType.textContent = '💬 Chat';
-                imageUploadArea.style.display = 'none';
-                imageCapable.style.display = 'none';
-                console.log('Chat model detected');
+            
+            if (!modelStatus || !chatCapable || !codeCapable || !imageCapable) {
+                console.error('Model capability elements not found');
+                return;
             }
+            
+            // Reset all capabilities
+            chatCapable.classList.add('hidden');
+            codeCapable.classList.add('hidden');
+            imageCapable.classList.add('hidden');
+            
+            if (!model) return;
+            
+            // All models support chat
+            chatCapable.classList.remove('hidden');
+            
+            // Code-capable models
+            if (model.includes('code') || model.includes('codellama') || 
+                model.includes('gemma') || model.includes('llama')) {
+                codeCapable.classList.remove('hidden');
+            }
+            
+            // Image-capable models
+            if (model.includes('llava') || model.includes('bakllava')) {
+                imageCapable.classList.remove('hidden');
+            }
+        }
+
+        // Tab management functions
+        let tabCounter = 0;
+        const tabs = new Map(); // Store tab contents
+
+        // Function to add new code tab with syntax highlighting and editing
+        function addNewTab(fileName, content) {
+            const tabId = `tab-${tabCounter++}`;
+            const language = getLanguageClass(fileName);
+            
+            // Create tab button
+            const tabButton = document.createElement('button');
+            tabButton.className = 'tab';
+            tabButton.dataset.tabId = tabId;
+            tabButton.innerHTML = `
+                <span>${getFileIcon(fileName)}</span>
+                <span>${fileName}</span>
+                <button class="close-tab" onclick="closeTab('${tabId}')">×</button>
+            `;
+            tabButton.onclick = () => showTab(tabId);
+            
+            // Create tab content
+            const tabContent = document.createElement('div');
+            tabContent.className = 'tab-content';
+            tabContent.id = tabId;
+            
+            // Create code container with line numbers
+            const codeContainer = document.createElement('div');
+            codeContainer.className = 'code-container';
+            
+            // Add line numbers
+            const lineNumbers = document.createElement('div');
+            lineNumbers.className = 'line-numbers';
+            const lines = content.split('\n');
+            lineNumbers.innerHTML = lines.map((_, i) => i + 1).join('\n');
+            
+            // Add code content with syntax highlighting
+            const codeContent = document.createElement('pre');
+            const codeElement = document.createElement('code');
+            codeElement.className = `language-${language} line-numbers`;
+            codeElement.textContent = content;
+            codeContent.appendChild(codeElement);
+            
+            // Add copy button
+            const copyButton = document.createElement('button');
+            copyButton.className = 'copy-button';
+            copyButton.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2v-2M8 4v12a2 2 0 002 2h8a2 2 0 002-2V8l-4-4H8z"/>
+                </svg>
+                Copy
+            `;
+            copyButton.onclick = () => {
+                navigator.clipboard.writeText(content);
+                copyButton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                    Copied!
+                `;
+                setTimeout(() => {
+                    copyButton.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2v-2M8 4v12a2 2 0 002 2h8a2 2 0 002-2V8l-4-4H8z"/>
+                        </svg>
+                        Copy
+                    `;
+                }, 2000);
+            };
+            
+            codeContainer.appendChild(lineNumbers);
+            codeContainer.appendChild(codeContent);
+            codeContainer.appendChild(copyButton);
+            tabContent.appendChild(codeContainer);
+            
+            // Add to DOM
+            document.querySelector('.tab-list').appendChild(tabButton);
+            document.getElementById('tabContents').appendChild(tabContent);
+            
+            // Store content
+            tabs.set(tabId, {
+                fileName: fileName,
+                content: content,
+                language: language,
+                editor: codeElement
+            });
+            
+            // Show the new tab
+            showTab(tabId);
+            
+            // Apply syntax highlighting
+            Prism.highlightElement(codeElement);
+        }
+
+        // Function to fix current code
+        async function fixCurrentCode() {
+            const activeTab = document.querySelector('.tab.active');
+            if (!activeTab) {
+                showMessage('No active tab to fix code', 'error');
+                return;
+            }
+            
+            const tabId = activeTab.dataset.tabId;
+            if (!tabId || !tabs.has(tabId)) {
+                showMessage('Cannot find active tab data', 'error');
+                return;
+            }
+            
+            await fixCode(tabId);
+        }
+
+        // Function to get appropriate file icon
+        function getFileIcon(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            const iconMap = {
+                'py': '🐍',
+                'js': '📜',
+                'html': '🌐',
+                'css': '🎨',
+                'json': '📋',
+                'txt': '📄',
+                'md': '📝'
+            };
+            return iconMap[ext] || '📄';
+        }
+
+        // Function to show tab
+        function showTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Show selected tab
+            const tab = document.querySelector(`.tab[data-tab-id="${tabId}"]`);
+            const content = document.getElementById(tabId);
+            if (tab && content) {
+                tab.classList.add('active');
+                content.style.display = 'block';
+            }
+        }
+
+        // Function to close tab
+        function closeTab(tabId) {
+            const tab = tabs.get(tabId);
+            if (tab) {
+                // Remove tab elements
+                const contentEl = document.getElementById(tabId);
+                if (contentEl) {
+                    contentEl.previousElementSibling.remove(); // Remove header
+                    contentEl.remove(); // Remove content
+                }
+                tabs.delete(tabId);
+            }
+        }
+
+        // Function to escape HTML
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Function to generate code
+        async function generateCode() {
+            const codeInput = document.getElementById('codeInput');
+            const prompt = codeInput.value.trim();
+            
+            if (!prompt) {
+                showMessage('Please enter a code generation prompt', 'error');
+                return;
+            }
+
+            const model = document.getElementById('modelSelect').value;
+            if (!model) {
+                showMessage('Please select a model first', 'error');
+                return;
+            }
+
+            showThinking(true);
+
+            try {
+                const response = await fetch(window.location.origin + '/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        prompt: prompt,
+                        type: 'code'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Parse the response to separate multiple files
+                const files = parseGeneratedCode(data.response);
+                
+                // Save each file to the generated_code directory
+                for (const file of files) {
+                    await fetch(window.location.origin + '/save_code', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            fileName: file.name,
+                            content: file.content
+                        })
+                    });
+                    
+                    // Add new tab for the file
+                    addNewTab(file.name, file.content);
+                }
+                
+                // Refresh file list
+                await loadGeneratedFiles();
+                
+                showMessage('Code generated and saved successfully!', 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Error generating code: ' + error.message, 'error');
+            } finally {
+                showThinking(false);
+            }
+        }
+
+        // Function to parse generated code into multiple files
+        function parseGeneratedCode(response) {
+            const files = [];
+            let currentFile = null;
+            let currentContent = [];
+            
+            // Split response into lines
+            const lines = response.split('\n');
+            
+            for (let line of lines) {
+                // Check for file markers like "```python", "```html", etc.
+                const fileMarker = line.match(/^```(?:\w+)?\n([\s\S]*?)\n```/);
+                if (fileMarker) {
+                    // If we were collecting content for a previous file, save it
+                    if (currentFile) {
+                        files.push({
+                            name: currentFile,
+                            content: currentContent.join('\n')
+                        });
+                    }
+                    // Start new file
+                    const ext = fileMarker[1];
+                    currentFile = `generated_${files.length + 1}.${ext}`;
+                    currentContent = [];
+                    continue;
+                }
+                
+                // Check for end of file marker
+                if (line === '```') {
+                    if (currentFile) {
+                        files.push({
+                            name: currentFile,
+                            content: currentContent.join('\n')
+                        });
+                        currentFile = null;
+                        currentContent = [];
+                    }
+                    continue;
+                }
+                
+                // If we're collecting content for a file, add the line
+                if (currentFile) {
+                    currentContent.push(line);
+                }
+            }
+            
+            // If no file markers were found, create a single .txt file
+            if (files.length === 0) {
+                files.push({
+                    name: 'generated_code.txt',
+                    content: response
+                });
+            }
+            
+            return files;
+        }
+
+        // Function to save all open files
+        async function saveAllFiles() {
+            const promises = [];
+            for (const [tabId, tab] of tabs.entries()) {
+                if (tab && tab.content) {
+                    promises.push(saveToProject(tabId));
+                }
+            }
+            
+            try {
+                await Promise.all(promises);
+                showMessage('All files saved successfully!', 'success');
+            } catch (error) {
+                showMessage('Error saving some files. Check console for details.', 'error');
+                console.error('Save all error:', error);
+            }
+        }
+
+        // Function to organize files by type
+        function organizeFiles() {
+            const files = Array.from(tabs.values());
+            const filesByType = {};
+            
+            files.forEach(file => {
+                const ext = file.fileName.split('.').pop().toLowerCase();
+                if (!filesByType[ext]) {
+                    filesByType[ext] = [];
+                }
+                filesByType[ext].push(file);
+            });
+            
+            // Create directories if they don't exist
+            fetch(window.location.origin + '/create_directories', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ types: Object.keys(filesByType) })
+            });
+            
+            return filesByType;
+        }
+
+        // Function to check if file exists
+        async function checkFileExists(fileName) {
+            try {
+                const response = await fetch(window.location.origin + '/check_file', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ fileName })
+                });
+                const data = await response.json();
+                return data.exists;
+            } catch (error) {
+                console.error('Error checking file:', error);
+                return false;
+            }
+        }
+
+        // Function to load generated files
+        async function loadGeneratedFiles() {
+            try {
+                const response = await fetch(window.location.origin + '/list_generated_files');
+                const data = await response.json();
+                
+                if (!data.files) {
+                    throw new Error('No files data received');
+                }
+                
+                // Clear existing file list
+                const fileList = document.getElementById('fileList');
+                fileList.innerHTML = '';
+                
+                if (data.files.length === 0) {
+                    fileList.innerHTML = `
+                        <div class="text-gray-400 text-center py-4">
+                            No files yet. Generate or save some code to see files here!
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Sort files by type and name
+                const sortedFiles = data.files.sort((a, b) => {
+                    if (a.type !== b.type) {
+                        return a.type.localeCompare(b.type);
+                    }
+                    return a.name.localeCompare(b.name);
+                });
+                
+                // Add each file to the list
+                for (const file of sortedFiles) {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.onclick = () => openFile(file.name);
+                    
+                    // Format file size
+                    const size = file.size < 1024 
+                        ? `${file.size} B`
+                        : `${(file.size / 1024).toFixed(1)} KB`;
+                    
+                    fileItem.innerHTML = `
+                        <span class="file-icon">${getFileIcon(file.name)}</span>
+                        <span class="file-name">${file.name}</span>
+                        <span class="file-type">${file.type}</span>
+                        <span class="file-size">${size}</span>
+                    `;
+                    
+                    fileList.appendChild(fileItem);
+                }
+            } catch (error) {
+                console.error('Error loading files:', error);
+                showMessage('Error loading files: ' + error.message, 'error');
+            }
+        }
+
+        // Function to open a file
+        async function openFile(fileName) {
+            try {
+                const response = await fetch(window.location.origin + '/get_generated_file_content', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ fileName: fileName })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load file: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                addNewTab(fileName, data.content);
+            } catch (error) {
+                console.error('Error opening file:', error);
+                showMessage('Error opening file: ' + error.message, 'error');
+            }
+        }
+
+        // Function to refresh the file list manually
+        async function refreshFileList() {
+            await loadGeneratedFiles();
+        }
+
+        // Add refresh button to the file list section
+        const fileListHeader = document.querySelector('#fileList').parentElement.querySelector('h2');
+        const refreshButton = document.createElement('button');
+        refreshButton.innerHTML = '↻';
+        refreshButton.className = 'ml-2 px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded text-white';
+        refreshButton.title = 'Refresh file list';
+        refreshButton.onclick = refreshFileList;
+        fileListHeader.appendChild(refreshButton);
+
+        // Update the save functions to refresh the file list after saving
+        async function saveToProject(tabId) {
+            if (!tabs.has(tabId)) {
+                console.error('Tab not found:', tabId);
+                return;
+            }
+
+            const tab = tabs.get(tabId);
+            const fileName = tab.fileName;
+
+            // Check if file exists
+            if (await checkFileExists(fileName)) {
+                const overwrite = confirm(`File ${fileName} already exists. Do you want to overwrite it?`);
+                if (!overwrite) {
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch(window.location.origin + '/save_code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fileName: fileName,
+                        code: tab.editor.getValue()
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to save file');
+                }
+
+                showMessage(`Saved ${fileName} successfully`, 'success');
+                await refreshFileList(); // Refresh the file list after saving
+            } catch (error) {
+                console.error('Save error:', error);
+                showMessage('Error saving file: ' + error.message, 'error');
+            }
+        }
+
+        // Function to extract code from AI response
+        function extractCodeFromResponse(response) {
+            // Match code between triple backticks
+            const codeMatch = response.match(/```(?:\w+)?\n([\s\S]*?)```/);
+            if (codeMatch) {
+                // Return the code without the language identifier
+                return codeMatch[1].trim();
+            }
+            
+            // If no code blocks found, try to find indented code
+            const lines = response.split('\n');
+            let codeLines = [];
+            let inCode = false;
+            
+            for (const line of lines) {
+                if (line.startsWith('    ') || line.startsWith('\t')) {
+                    inCode = true;
+                    codeLines.push(line.replace(/^(    |\t)/, ''));
+                } else if (inCode && line.trim() === '') {
+                    codeLines.push('');
+                } else {
+                    inCode = false;
+                }
+            }
+            
+            if (codeLines.length > 0) {
+                return codeLines.join('\n').trim();
+            }
+            
+            // If no code blocks found, return null
+            return null;
         }
 
         // Command line functionality
@@ -508,15 +1459,13 @@ function showMessage(message, type = 'info') {
                 if (!command) return;
 
                 const terminalOutput = document.getElementById('terminalOutput');
-                
-                // Add command to output
                 const cmdLine = document.createElement('div');
                 cmdLine.className = 'text-white';
                 cmdLine.textContent = `> ${command}`;
                 terminalOutput.appendChild(cmdLine);
-                
+
                 try {
-                    const response = await fetch('/execute_command', {
+                    const response = await fetch(`${window.location.origin}/execute`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -524,101 +1473,30 @@ function showMessage(message, type = 'info') {
                         body: JSON.stringify({ command: command })
                     });
 
-                    const result = await response.json();
+                    const data = await response.json();
                     
-                    // Add command output to terminal
-                    const outputLine = document.createElement('div');
-                    outputLine.className = 'text-white whitespace-pre-wrap';
-                    outputLine.textContent = result.output || '';
-                    terminalOutput.appendChild(outputLine);
-                    
-                    // Show error if any
-                    if (result.error) {
-                        const errorLine = document.createElement('div');
-                        errorLine.className = 'text-red-500';
-                        errorLine.textContent = result.error;
-                        terminalOutput.appendChild(errorLine);
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Command execution failed');
                     }
+
+                    const output = document.createElement('div');
+                    output.className = 'text-gray-300 whitespace-pre-wrap';
+                    output.textContent = data.output || '';
+                    terminalOutput.appendChild(output);
                     
-                    // Update current path if provided
-                    if (result.cwd) {
-                        document.getElementById('currentPathSpan').textContent = result.cwd + '>';
-                    }
+                    // Auto-scroll to bottom
+                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
                 } catch (error) {
-                    const errorLine = document.createElement('div');
-                    errorLine.className = 'text-red-500';
-                    errorLine.textContent = 'Error executing command: ' + error.message;
-                    terminalOutput.appendChild(errorLine);
+                    console.error('Error executing command:', error);
+                    const errorOutput = document.createElement('div');
+                    errorOutput.className = 'text-red-500';
+                    errorOutput.textContent = error.message;
+                    terminalOutput.appendChild(errorOutput);
                 }
-                
-                // Clear input and scroll to bottom
+
                 cmdInput.value = '';
-                terminalOutput.scrollTop = terminalOutput.scrollHeight;
             }
         }
-
-        // Initialize when document is ready
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('Document loaded, initializing...');
-            
-            // Initialize UI elements
-            const currentPathSpan = document.getElementById('currentPathSpan');
-            const modelSelect = document.getElementById('modelSelect');
-            const userInput = document.getElementById('userInput');
-            const cmdInput = document.getElementById('cmdInput');
-            
-            if (!currentPathSpan || !modelSelect || !userInput || !cmdInput) {
-                console.error('Required UI elements not found');
-                return;
-            }
-            
-            // Get current working directory
-            try {
-                const cwdResponse = await fetch('/get_cwd');
-                if (!cwdResponse.ok) {
-                    throw new Error(`HTTP error! status: ${cwdResponse.status}`);
-                }
-                const cwdData = await cwdResponse.json();
-                if (cwdData.cwd) {
-                    currentPathSpan.textContent = cwdData.cwd + '>';
-                }
-            } catch (error) {
-                console.error('Error getting CWD:', error);
-                currentPathSpan.textContent = 'C:\\>';
-            }
-            
-            // Load models with retry
-            try {
-                await loadModels();
-            } catch (error) {
-                console.error('Error loading models:', error);
-                showMessage('Failed to load models. Please check if Ollama is running.', 'error');
-                
-                // Add retry button
-                if (modelSelect) {
-                    modelSelect.innerHTML = '<option value="">Error loading models</option>';
-                    const retryBtn = document.createElement('button');
-                    retryBtn.textContent = 'Retry';
-                    retryBtn.className = 'ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600';
-                    retryBtn.onclick = loadModels;
-                    modelSelect.parentNode.appendChild(retryBtn);
-                }
-            }
-            
-            // Add event listeners
-            modelSelect.addEventListener('change', checkModelCapabilities);
-            
-            userInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-            
-            cmdInput.addEventListener('keydown', handleCommandInput);
-            
-            console.log('Initialization complete');
-        });
     </script>
 </body>
 </html>
