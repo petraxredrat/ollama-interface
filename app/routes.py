@@ -434,79 +434,19 @@ def process_image():
 @bp.route('/get_cwd')
 def get_cwd():
     try:
-        return jsonify({"cwd": os.getcwd()})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@bp.route('/execute', methods=['POST'])
-def execute_command():
-    global CURRENT_DIR  # Declare global at the start of the function
-    try:
-        data = request.get_json()
-        command = data.get('command', '').strip()
-        
-        if not command:
-            return jsonify({"error": "No command provided"}), 400
-
-        # Handle cd commands specially
-        if command.startswith('cd '):
-            new_path = command[3:].strip()
-            if new_path == '..':
-                new_path = os.path.dirname(CURRENT_DIR)
-            else:
-                new_path = os.path.abspath(os.path.join(CURRENT_DIR, new_path))
-            
-            if os.path.exists(new_path) and os.path.isdir(new_path):
-                CURRENT_DIR = new_path
-                return jsonify({
-                    "output": f"Changed directory to: {CURRENT_DIR}",
-                    "cwd": CURRENT_DIR
-                })
-            else:
-                return jsonify({"error": f"Directory not found: {new_path}"}), 404
-
-        # Handle Python commands
-        if command.startswith('python '):
-            command = f"{sys.executable} {command[7:]}"
-
-        # Execute the command
-        process = subprocess.Popen(
-            command,
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=CURRENT_DIR,
-            text=True
-        )
-        
-        stdout, stderr = process.communicate()
-        
-        if process.returncode != 0:
-            return jsonify({
-                "error": stderr,
-                "output": stdout,
-                "cwd": CURRENT_DIR
-            }), 500
-            
-        return jsonify({
-            "output": stdout,
-            "cwd": CURRENT_DIR
-        })
-        
+        return jsonify({"cwd": CURRENT_DIR})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @bp.route('/list_files')
 def list_files():
     try:
-        # Create the directory if it doesn't exist
-        os.makedirs(GENERATED_CODE_DIR, exist_ok=True)
-        
         files = []
-        for file in os.listdir(GENERATED_CODE_DIR):
-            if os.path.isfile(os.path.join(GENERATED_CODE_DIR, file)):
-                files.append(file)
-        
+        for root, dirs, filenames in os.walk(GENERATED_CODE_DIR):
+            for filename in filenames:
+                full_path = os.path.join(root, filename)
+                rel_path = os.path.relpath(full_path, GENERATED_CODE_DIR)
+                files.append(rel_path)
         return jsonify({"files": files})
     except Exception as e:
         return jsonify({"error": str(e)}), 500

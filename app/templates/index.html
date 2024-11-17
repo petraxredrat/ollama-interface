@@ -289,487 +289,341 @@
             width: 100% !important;
             max-width: none !important;
         }
+        
+        /* Model Capabilities */
+        #modelCapabilities {
+            margin-top: 1rem;
+        }
+        #modelCapabilities span {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+        }
+        #chatCapable {
+            background-color: #34C759;
+            color: #fff;
+        }
+        #codeCapable {
+            background-color: #3498DB;
+            color: #fff;
+        }
+        #imageCapable {
+            background-color: #9B59B6;
+            color: #fff;
+        }
+        #mathCapable {
+            background-color: #F1C40F;
+            color: #fff;
+        }
+        #internetCapable {
+            background-color: #E74C3C;
+            color: #fff;
+        }
+        #analysisCapable {
+            background-color: #8E44AD;
+            color: #fff;
+        }
+        
+        /* Model Capabilities */
+        .capability-badge {
+            display: none;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        #chatCapable.active {
+            display: flex;
+            background-color: #34D399;
+            color: white;
+        }
+        
+        #codeCapable.active {
+            display: flex;
+            background-color: #60A5FA;
+            color: white;
+        }
+        
+        #imageCapable.active {
+            display: flex;
+            background-color: #A78BFA;
+            color: white;
+        }
+        
+        #mathCapable.active {
+            display: flex;
+            background-color: #FBBF24;
+            color: white;
+        }
+        
+        #internetCapable.active {
+            display: flex;
+            background-color: #F87171;
+            color: white;
+        }
+        
+        #analysisCapable.active {
+            display: flex;
+            background-color: #818CF8;
+            color: white;
+        }
+        
+        /* Code Display Section */
+        #codeDisplaySection {
+            display: none;
+            margin-top: 1rem;
+            background: #1E1E1E;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        #codeDisplaySection.active {
+            display: block;
+        }
+
+        .code-tabs {
+            display: flex;
+            background: #2D2D2D;
+            border-bottom: 1px solid #404040;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .code-tab {
+            padding: 0.75rem 1.5rem;
+            color: #9CA3AF;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .code-tab:hover {
+            color: #F3F4F6;
+            background: #363636;
+        }
+
+        .code-tab.active {
+            color: #60A5FA;
+            border-bottom-color: #60A5FA;
+            background: #363636;
+        }
+
+        .code-content {
+            padding: 1rem;
+            display: none;
+            background: #1E1E1E;
+        }
+
+        .code-content.active {
+            display: block;
+        }
+
+        .code-content pre {
+            margin: 0;
+            padding: 1rem;
+            background: #2D2D2D;
+            border-radius: 0.375rem;
+            overflow-x: auto;
+        }
+
+        .code-content code {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #E5E7EB;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: #2D2D2D;
+            border-bottom: 1px solid #404040;
+        }
+
+        .code-header h3 {
+            color: #E5E7EB;
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .copy-button {
+            padding: 0.25rem 0.75rem;
+            background: #4B5563;
+            color: #E5E7EB;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .copy-button:hover {
+            background: #6B7280;
+        }
+
+        .copy-button.copied {
+            background: #059669;
+        }
+        
+        /* Thinking Indicator */
+        .thinking-indicator {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 0.5rem;
+            color: #60A5FA;
+            font-size: 0.875rem;
+        }
+
+        .thinking-indicator.active {
+            display: flex;
+        }
+
+        .thinking-dots {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .thinking-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            background: #60A5FA;
+            border-radius: 50%;
+            animation: thinking 1.4s infinite;
+        }
+
+        .thinking-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .thinking-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes thinking {
+            0%, 100% {
+                opacity: 0.4;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 <body class="p-8">
     <div class="max-w-full mx-auto">
         <h1 class="text-3xl font-bold mb-8 text-white">Ollama Interface</h1>
         
-        <div class="grid grid-cols-2 gap-8">
-                    <!-- Thinking Indicator -->
-        <div id="thinkingIndicator" class="thinking">
-            <svg class="spinner" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span>AI is thinking...</span>
-        </div>
-
-        <!-- Message Display -->
-        <div id="message" class="fixed top-4 right-4 p-4 rounded shadow-lg hidden"></div>
-            <!-- Left Column -->
-            <div class="space-y-6">
-                <!-- Model Selection -->
-                <div class="mb-4">
-                    <h2 class="text-xl font-semibold mb-2">Model Selection</h2>
-                    <select id="modelSelect" class="w-full p-2 bg-gray-700 text-white rounded"></select>
-                    <div id="modelStatus" class="mt-2 text-sm">
-                        <span id="chatCapable" class="hidden mr-2 px-2 py-1 bg-green-500 text-white rounded">Chat</span>
-                        <span id="codeCapable" class="hidden mr-2 px-2 py-1 bg-blue-500 text-white rounded">Code</span>
-                        <span id="imageCapable" class="hidden mr-2 px-2 py-1 bg-purple-500 text-white rounded">Image</span>
+        <div class="flex flex-col gap-8">
+            <!-- Model Selection -->
+            <div class="mb-4">
+                <h2 class="text-xl font-semibold mb-4 text-white">Model Selection</h2>
+                <div class="flex items-center space-x-4">
+                    <select id="modelSelect" class="p-2 rounded bg-gray-700 text-white flex-grow" onchange="checkModelCapabilities()">
+                        <option value="">Loading models...</option>
+                    </select>
+                    <button onclick="downloadModel()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        Download
+                    </button>
+                </div>
+                <!-- Download Success Message -->
+                <div id="downloadSuccess" class="hidden fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg">
+                    Model Downloaded Successfully!
+                </div>
+                <!-- Thinking Indicator -->
+                <div class="thinking-indicator" id="thinkingIndicator">
+                    <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>AI is thinking</span>
+                    <div class="thinking-dots">
+                        <div class="thinking-dot"></div>
+                        <div class="thinking-dot"></div>
+                        <div class="thinking-dot"></div>
                     </div>
                 </div>
+                <!-- Model Capabilities -->
+                <div id="modelCapabilities" class="mt-4 flex flex-wrap gap-2">
+                    <span id="chatCapable" class="capability-badge">
+                        <span class="mr-1">💬</span> Chat
+                    </span>
+                    <span id="codeCapable" class="capability-badge">
+                        <span class="mr-1">👨‍💻</span> Code
+                    </span>
+                    <span id="imageCapable" class="capability-badge">
+                        <span class="mr-1">🖼️</span> Image
+                    </span>
+                    <span id="mathCapable" class="capability-badge">
+                        <span class="mr-1">🔢</span> Math
+                    </span>
+                    <span id="internetCapable" class="capability-badge">
+                        <span class="mr-1">🌐</span> Internet
+                    </span>
+                    <span id="analysisCapable" class="capability-badge">
+                        <span class="mr-1">📊</span> Analysis
+                    </span>
+                </div>
+            </div>
 
-                <!-- Generated Files Browser -->
+            <!-- Chat Section -->
+            <div class="mt-8" id="chatSection">
                 <div class="card-gray-1 p-6 rounded-lg shadow-lg">
-                    <h2 class="text-xl font-semibold mb-4">Generated Files</h2>
-                    <div id="fileList" class="space-y-2"></div>
-                </div>
-
-                <!-- Code Editor -->
-                <div class="card-gray-1 p-6 rounded-lg shadow-lg">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold">Code Editor</h2>
-                        <div class="space-x-2">
-                            <button onclick="fixCurrentCode()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Fix Code</button>
-                            <button onclick="saveAllFiles()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Save All</button>
+                    <h2 class="text-xl font-semibold mb-4 text-white">Chat</h2>
+                    <div id="chatMessages" class="space-y-4 mb-4 max-h-96 overflow-y-auto"></div>
+                    <div id="imagePreviewContainer" class="mb-4"></div>
+                    <div class="flex items-start space-x-2">
+                        <div class="flex-grow">
+                            <textarea id="userInput" class="w-full p-2 rounded bg-gray-700 text-white" rows="3" placeholder="Type your message here..."></textarea>
+                            <div class="mt-2">
+                                <input type="file" id="chatImageUpload" accept="image/*" class="hidden" onchange="handleChatImageUpload(event)">
+                                <button onclick="document.getElementById('chatImageUpload').click()" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                    Attach Image
+                                </button>
+                                <button id="removeImageBtn" onclick="removeImageFromChat()" class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 hidden">
+                                    Remove Image
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="tab-list"></div>
-                    <div id="tabContents" class="relative"></div>
-                </div>
-
-                <!-- Image Upload Area -->
-                <div id="imageUploadArea" class="card-gray-2 p-6 rounded-lg shadow-lg mt-4" style="display: none;">
-                    <h2 class="text-xl font-semibold mb-4 text-white">Image Upload</h2>
-                    <div class="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center">
-                        <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)" class="hidden">
-                        <label for="imageInput" class="cursor-pointer text-gray-300 hover:text-white">
-                            Click to upload an image or drag and drop
-                        </label>
-                    </div>
-                    <div id="imagePreview" class="mt-4 hidden">
-                        <img id="uploadedImage" class="max-w-full h-auto rounded-lg">
-                        <button onclick="removeImage()" class="mt-2 text-red-500 hover:text-red-600">Remove Image</button>
-                    </div>
-                </div>
-
-                <!-- Code Generation -->
-                <div class="card-gray-3 p-6 rounded-lg shadow-lg" id="codeSection">
-                    <h2 class="text-xl font-semibold mb-4 text-white">Code Generation</h2>
-                    <div class="flex space-x-4 mb-4">
-                        <textarea id="codeInput" class="w-full h-32 p-2 border rounded custom-input" placeholder="Describe the code you want to generate or the error you want to fix..."></textarea>
-                    </div>
-                    <div class="flex space-x-2 mb-4">
-                        <button onclick="generateCode()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Generate New</button>
-                        <button onclick="fixCurrentCode()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Fix Current Code</button>
-                    </div>
-                    <div id="tabContents" class="mt-4"></div>
-                    <div class="tab-list">
-                        <button class="new-tab-button" onclick="addNewTab()">+ New File</button>
+                        <button onclick="sendMessage()" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Send</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column -->
-            <div class="space-y-6">
-                <!-- Preview with Tabs -->
-                <div class="card-gray-4 p-6 rounded-lg shadow-lg">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-semibold text-white">Preview</h2>
-                        <div class="flex items-center">
-                            <button onclick="checkAllFiles()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2">Check Files</button>
-                            <button onclick="saveAllFiles()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Save All</button>
-                        </div>
-                    </div>
-                    <div id="tabs" class="tab-list">
-                    </div>
-                    <div id="file-contents">
-                        <!-- Tab contents will be added here dynamically -->
-                    </div>
+            <!-- Code Display Section -->
+            <div id="codeDisplaySection" class="mt-4">
+                <div class="code-tabs">
+                    <!-- Tabs will be added dynamically -->
                 </div>
-            </div>
-        </div>
-
-        <!-- Chat Section -->
-        <div class="mt-8" id="chatSection">
-            <div class="card-gray-1 p-6 rounded-lg shadow-lg">
-                <h2 class="text-xl font-semibold mb-4 text-white">Chat</h2>
-                <div id="chatMessages" class="space-y-4 mb-4 h-96 overflow-y-auto"></div>
-                <div class="flex flex-col space-y-2">
-                    <div id="imagePreviewInChat" class="hidden">
-                        <img id="chatImagePreview" class="max-h-48 rounded-lg mb-2">
-                        <button onclick="removeImageFromChat()" class="text-red-500 hover:text-red-600 text-sm">Remove Image</button>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="flex-1 flex items-center bg-black rounded-lg px-2">
-                            <input type="text" id="userInput" class="flex-1 p-2 bg-black text-white border-none focus:outline-none font-mono" placeholder="Type a message...">
-                        </div>
-                        <label for="chatImageUpload" class="cursor-pointer p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                            📷
-                        </label>
-                        <input type="file" id="chatImageUpload" accept="image/*" class="hidden" onchange="handleChatImageUpload(event)">
-                        <button onclick="sendMessage()" class="p-2 bg-green-500 text-white rounded hover:bg-green-600">Send</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Command Terminal (At Bottom) -->
-        <div class="mt-8">
-            <div class="card-gray-1 p-6 rounded-lg shadow-lg">
-                <h2 class="text-xl font-semibold mb-4 text-white">Command Prompt</h2>
-                <div class="bg-black p-4 rounded-lg mb-4 h-[32rem] overflow-y-auto font-mono text-sm" id="terminalOutput">
-                    <div class="text-white">Microsoft Windows [Version 10.0.19045.3803]</div>
-                    <div class="text-white">Copyright (c) Microsoft Corporation. All rights reserved.</div>
-                    <div class="text-white mb-2" id="currentPath"></div>
-                </div>
-                <div class="flex items-center bg-black rounded-lg px-2">
-                    <span class="text-white mr-2" id="currentPathSpan"></span>
-                    <input type="text" id="cmdInput" 
-                           class="flex-1 p-2 bg-black text-white border-none focus:outline-none font-mono" 
-                           placeholder=""
-                           onkeydown="handleCommandInput(event)">
+                <div class="code-contents">
+                    <!-- Code content will be added dynamically -->
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/line-numbers/prism-line-numbers.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-python.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-css.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-markup.min.js"></script>
-    
     <script>
         let currentImageData = null;
         let isMultimodalModel = false;
         let isCodeModel = false;
         let downloadCounter = 0;
 
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('Document loaded, initializing...');
-            await loadModels();
-            await loadGeneratedFiles();
-            console.log('Initialization complete');
-        });
-
-        // Function to detect file type and return appropriate language class
-        function getLanguageClass(fileName) {
-            if (!fileName) return 'plaintext';
-            const parts = fileName.split('.');
-            if (parts.length < 2) return 'plaintext';
-            
-            const ext = parts.pop().toLowerCase();
-            const langMap = {
-                'py': 'python',
-                'js': 'javascript',
-                'html': 'html',
-                'css': 'css',
-                'json': 'json',
-                'md': 'markdown',
-                'txt': 'plaintext'
-            };
-            return langMap[ext] || 'plaintext';
-        }
-
-        // Function to check all files
-        function checkAllFiles() {
-            const fileInputs = document.querySelectorAll('input[type="file"]');
-            fileInputs.forEach(input => {
-                if (input.files.length > 0) {
-                    const file = input.files[0];
-                    console.log(`File ${file.name} selected`);
-                }
-            });
-        }
-
-        // Function to download code with proper MIME types
-        function downloadCode(tabId) {
-            const tab = tabs.get(tabId);
-            if (tab) {
-                downloadCounter++;
-                const mimeTypes = {
-                    'python': 'text/x-python',
-                    'javascript': 'text/javascript',
-                    'html': 'text/html',
-                    'css': 'text/css',
-                    'json': 'application/json',
-                    'plaintext': 'text/plain'
-                };
-
-                const mimeType = mimeTypes[tab.language] || 'text/plain';
-                const blob = new Blob([tab.content], { type: mimeType });
-                const url = window.URL.createObjectURL(blob);
-                
-                // Create download link with security attributes
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = tab.fileName;
-                a.rel = 'noopener noreferrer';
-                a.setAttribute('data-downloadid', `safe-download-${downloadCounter}`);
-                
-                // Add to page temporarily and trigger download
-                document.body.appendChild(a);
-                a.click();
-                
-                // Cleanup
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 100);
-            }
-        }
-
-        // Function to save to project with proper error handling
-        async function saveToProject(tabId) {
-            const tab = tabs.get(tabId);
-            if (!tab) {
-                throw new Error('Tab not found');
-            }
-
-            // Get the content from the pre element
-            const content = tab.editor.textContent || tab.editor.innerText;
-            
-            try {
-                const response = await fetch(window.location.origin + '/save_code', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        fileName: tab.fileName,
-                        content: content,
-                        language: tab.language
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to save file');
-                }
-
-                showMessage('File saved successfully!', 'success');
-            } catch (error) {
-                console.error('Save error:', error);
-                showMessage('Error saving file: ' + error.message, 'error');
-                throw error;
-            }
-        }
-
-        // Function to fix specific tab's code
-        async function fixCode(tabId) {
-            const tab = tabs.get(tabId);
-            if (!tab) {
-                showMessage('Error: Could not find tab data', 'error');
-                return;
-            }
-
-            showThinking(true);
-            try {
-                const content = tab.editor.textContent || tab.editor.innerText;
-                if (!content) {
-                    throw new Error('No code to fix');
-                }
-
-                const response = await fetch(window.location.origin + '/generate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        prompt: `Fix this code and explain what was wrong. Only output the fixed code between \`\`\` markers:\n\n${content}`,
-                        model: document.getElementById('modelSelect').value
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to fix code');
-                }
-
-                const data = await response.json();
-                if (!data.response) {
-                    throw new Error('No response from AI');
-                }
-
-                // Extract the fixed code from the response
-                const fixedCode = extractCodeFromResponse(data.response);
-                if (fixedCode) {
-                    // Update the current tab's content
-                    tab.editor.textContent = fixedCode;
-                    
-                    // Re-highlight the code
-                    Prism.highlightElement(tab.editor);
-                    
-                    // Save the changes
-                    await saveToProject(tabId);
-                    
-                    showMessage('Code fixed and saved successfully!', 'success');
-                    // Add the explanation to chat messages
-                    const chatMessages = document.getElementById('chatMessages');
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = 'message assistant bg-gray-700 p-2 rounded';
-                    messageDiv.textContent = data.response;
-                    chatMessages.appendChild(messageDiv);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                } else {
-                    showMessage('No code fixes found in the response', 'warning');
-                }
-            } catch (error) {
-                console.error('Error fixing code:', error);
-                showMessage('Error fixing code: ' + error.message, 'error');
-            } finally {
-                showThinking(false);
-            }
-        }
-
-        // Function to show/hide thinking indicator
-        function showThinking(show) {
-            const indicator = document.getElementById('thinkingIndicator');
-            indicator.style.display = show ? 'block' : 'none';
-        }
-
-        // Function to show message
-function showMessage(message, type = 'info') {
-    const messageDiv = document.getElementById('message');
-    if (!messageDiv) {
-        console.error('Message div not found');
-        return;
-    }
-    messageDiv.textContent = message;
-    messageDiv.className = `fixed top-4 right-4 p-4 rounded shadow-lg ${
-        type === 'error' ? 'bg-red-500' : 'bg-green-500'
-    } text-white`;
-    messageDiv.style.display = 'block';
-    setTimeout(() => {
-        messageDiv.style.display = 'none';
-    }, 3000);
-}
-
-        // Function to handle image upload
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const previewDiv = document.getElementById('imagePreview');
-                const previewImg = document.getElementById('uploadedImage');
-                currentImageData = e.target.result.split(',')[1]; // Store base64 data
-                previewImg.src = e.target.result;
-                previewDiv.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Function to remove uploaded image
-        function removeImage() {
-            const previewDiv = document.getElementById('imagePreview');
-            const previewImg = document.getElementById('uploadedImage');
-            currentImageData = null;
-            previewImg.src = '';
-            previewDiv.style.display = 'none';
-            document.getElementById('imageInput').value = '';
-        }
-
-        // Function to send message
-        async function sendMessage() {
-            const userInput = document.getElementById('userInput');
-            const message = userInput.value.trim();
-            
-            if (!message && !currentImageData) return;
-            
-            const model = document.getElementById('modelSelect').value;
-            if (!model) {
-                showMessage('Please select a model first', 'error');
-                return;
-            }
-
-            // Add user message to chat
-            if (message) {
-                addMessageToChat('user', message);
-            }
-            
-            // Add image to chat if present
-            if (currentImageData) {
-                const imgElement = document.createElement('img');
-                imgElement.src = document.getElementById('chatImagePreview').src;
-                imgElement.className = 'max-h-48 rounded-lg mt-2';
-                const lastMessage = document.getElementById('chatMessages').lastElementChild;
-                if (lastMessage) {
-                    lastMessage.appendChild(imgElement);
-                }
-            }
-
-            userInput.value = '';
-            showThinking(true);
-
-            try {
-                const response = await fetch(window.location.origin + '/generate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: model,
-                        prompt: message,
-                        image: currentImageData
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                addMessageToChat('assistant', data.response);
-                
-                // Clear image after sending
-                if (currentImageData) {
-                    removeImageFromChat();
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showMessage('Error sending message: ' + error.message, 'error');
-            } finally {
-                showThinking(false);
-            }
-        }
-
-        // Function to handle image upload in chat
-        async function handleChatImageUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const previewDiv = document.getElementById('imagePreviewInChat');
-                const previewImg = document.getElementById('chatImagePreview');
-                currentImageData = e.target.result.split(',')[1];
-                previewImg.src = e.target.result;
-                previewDiv.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // Function to remove image from chat
-        function removeImageFromChat() {
-            const previewDiv = document.getElementById('imagePreviewInChat');
-            const previewImg = document.getElementById('chatImagePreview');
-            currentImageData = null;
-            previewImg.src = '';
-            previewDiv.classList.add('hidden');
-            document.getElementById('chatImageUpload').value = '';
-        }
-
-        // Function to load models
         async function loadModels() {
             const select = document.getElementById('modelSelect');
             select.innerHTML = '<option value="">Loading models...</option>';
             select.disabled = true;
             
             try {
-                // First check if Ollama is running
                 const checkResponse = await fetch(window.location.origin + '/check_ollama');
                 if (!checkResponse.ok) {
                     const checkResult = await checkResponse.json();
@@ -812,13 +666,11 @@ function showMessage(message, type = 'info') {
                 select.innerHTML = '<option value="">Error loading models</option>';
                 showMessage(error.message, 'error');
                 
-                // Add a retry button with more context
                 const retryBtn = document.createElement('button');
                 retryBtn.textContent = 'Retry Loading Models';
                 retryBtn.className = 'ml-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600';
                 retryBtn.onclick = loadModels;
                 
-                // Remove any existing retry button before adding a new one
                 const existingRetryBtn = select.parentNode.querySelector('button');
                 if (existingRetryBtn) {
                     existingRetryBtn.remove();
@@ -830,7 +682,6 @@ function showMessage(message, type = 'info') {
             }
         }
 
-        // Function to download model
         async function downloadModel() {
             const select = document.getElementById('modelSelect');
             const model = select.value;
@@ -842,11 +693,9 @@ function showMessage(message, type = 'info') {
 
             const downloadBtn = document.querySelector('button[onclick="downloadModel()"]');
             downloadBtn.disabled = true;
-            downloadBtn.innerHTML = '<span class="loading">Downloading 0%</span>';
-            showThinking(true);
-
+            downloadBtn.textContent = 'Downloading...';
+            
             try {
-                console.log('Loading model:', model);
                 const response = await fetch(window.location.origin + '/pull_model', {
                     method: 'POST',
                     headers: {
@@ -861,255 +710,99 @@ function showMessage(message, type = 'info') {
                     throw new Error(result.error || 'Failed to load model');
                 }
 
-                // Update progress based on total downloaded
-                if (result.total_downloaded) {
-                    downloadBtn.innerHTML = `<span class="loading">Downloaded ${result.total_downloaded}%</span>`;
-                }
+                // Show success message in top-right corner
+                const successMsg = document.getElementById('downloadSuccess');
+                successMsg.classList.remove('hidden');
+                setTimeout(() => {
+                    successMsg.classList.add('hidden');
+                }, 3000);
 
-                showMessage(result.message || 'Model loaded successfully!', 'success');
-                
-                // Refresh model capabilities after successful download
                 await checkModelCapabilities();
                 
             } catch (error) {
                 console.error('Error loading model:', error);
                 showMessage(error.message, 'error');
-                
-                // Add retry button if failed
-                downloadBtn.innerHTML = 'Retry Download';
-                downloadBtn.onclick = () => {
-                    downloadBtn.innerHTML = 'Download Model';
-                    downloadBtn.onclick = downloadModel;
-                    downloadModel();
-                };
             } finally {
-                showThinking(false);
-                if (downloadBtn.innerHTML.includes('Downloading')) {
-                    downloadBtn.disabled = false;
-                    downloadBtn.innerHTML = 'Download Model';
-                }
+                downloadBtn.disabled = false;
+                downloadBtn.textContent = 'Download';
             }
         }
 
-        // Function to check model capabilities
+        function showThinking(show) {
+            const thinking = document.getElementById('thinkingIndicator');
+            if (thinking) {
+                thinking.classList.toggle('active', show);
+            }
+        }
+
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.getElementById('message');
+            if (messageDiv) {
+                messageDiv.textContent = message;
+                messageDiv.className = `fixed top-4 right-4 p-4 rounded shadow-lg ${type === 'error' ? 'bg-red-500' : 'bg-green-500'} text-white`;
+                messageDiv.classList.remove('hidden');
+                setTimeout(() => {
+                    messageDiv.classList.add('hidden');
+                }, 3000);
+            }
+        }
+
         function checkModelCapabilities() {
             const model = document.getElementById('modelSelect').value.toLowerCase();
-            const modelStatus = document.getElementById('modelStatus');
-            const chatCapable = document.getElementById('chatCapable');
-            const codeCapable = document.getElementById('codeCapable');
-            const imageCapable = document.getElementById('imageCapable');
             
-            if (!modelStatus || !chatCapable || !codeCapable || !imageCapable) {
-                console.error('Model capability elements not found');
-                return;
-            }
-            
-            // Reset all capabilities
-            chatCapable.classList.add('hidden');
-            codeCapable.classList.add('hidden');
-            imageCapable.classList.add('hidden');
-            
-            if (!model) return;
-            
-            // All models support chat
-            chatCapable.classList.remove('hidden');
-            
-            // Code-capable models
-            if (model.includes('code') || model.includes('codellama') || 
-                model.includes('gemma') || model.includes('llama')) {
-                codeCapable.classList.remove('hidden');
-            }
-            
-            // Image-capable models
-            if (model.includes('llava') || model.includes('bakllava')) {
-                imageCapable.classList.remove('hidden');
-            }
-        }
-
-        // Tab management functions
-        let tabCounter = 0;
-        const tabs = new Map(); // Store tab contents
-
-        // Function to add new code tab with syntax highlighting and editing
-        function addNewTab(fileName, content) {
-            const tabId = `tab-${tabCounter++}`;
-            const language = getLanguageClass(fileName);
-            
-            // Create tab button
-            const tabButton = document.createElement('button');
-            tabButton.className = 'tab';
-            tabButton.dataset.tabId = tabId;
-            tabButton.innerHTML = `
-                <span>${getFileIcon(fileName)}</span>
-                <span>${fileName}</span>
-                <button class="close-tab" onclick="closeTab('${tabId}')">×</button>
-            `;
-            tabButton.onclick = () => showTab(tabId);
-            
-            // Create tab content
-            const tabContent = document.createElement('div');
-            tabContent.className = 'tab-content';
-            tabContent.id = tabId;
-            
-            // Create code container with line numbers
-            const codeContainer = document.createElement('div');
-            codeContainer.className = 'code-container';
-            
-            // Add line numbers
-            const lineNumbers = document.createElement('div');
-            lineNumbers.className = 'line-numbers';
-            const lines = content.split('\n');
-            lineNumbers.innerHTML = lines.map((_, i) => i + 1).join('\n');
-            
-            // Add code content with syntax highlighting
-            const codeContent = document.createElement('pre');
-            const codeElement = document.createElement('code');
-            codeElement.className = `language-${language} line-numbers`;
-            codeElement.textContent = content;
-            codeContent.appendChild(codeElement);
-            
-            // Add copy button
-            const copyButton = document.createElement('button');
-            copyButton.className = 'copy-button';
-            copyButton.innerHTML = `
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2v-2M8 4v12a2 2 0 002 2h8a2 2 0 002-2V8l-4-4H8z"/>
-                </svg>
-                Copy
-            `;
-            copyButton.onclick = () => {
-                navigator.clipboard.writeText(content);
-                copyButton.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M20 6L9 17l-5-5"/>
-                    </svg>
-                    Copied!
-                `;
-                setTimeout(() => {
-                    copyButton.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2v-2M8 4v12a2 2 0 002 2h8a2 2 0 002-2V8l-4-4H8z"/>
-                        </svg>
-                        Copy
-                    `;
-                }, 2000);
+            // Define capability checks
+            const capabilities = {
+                'chatCapable': true, // All models support chat
+                'codeCapable': model.includes('code') || model.includes('codellama') || 
+                              model.includes('gemma') || model.includes('llama'),
+                'imageCapable': model.includes('llava') || model.includes('bakllava'),
+                'mathCapable': model.includes('math') || model.includes('codellama') || 
+                              model.includes('phind'),
+                'internetCapable': model.includes('gpt4') || model.includes('claude'),
+                'analysisCapable': model.includes('analyst') || model.includes('codellama') || 
+                                  model.includes('gpt4') || model.includes('claude')
             };
             
-            codeContainer.appendChild(lineNumbers);
-            codeContainer.appendChild(codeContent);
-            codeContainer.appendChild(copyButton);
-            tabContent.appendChild(codeContainer);
+            // Update global flags
+            isMultimodalModel = capabilities.imageCapable;
+            isCodeModel = capabilities.codeCapable;
             
-            // Add to DOM
-            document.querySelector('.tab-list').appendChild(tabButton);
-            document.getElementById('tabContents').appendChild(tabContent);
-            
-            // Store content
-            tabs.set(tabId, {
-                fileName: fileName,
-                content: content,
-                language: language,
-                editor: codeElement
-            });
-            
-            // Show the new tab
-            showTab(tabId);
-            
-            // Apply syntax highlighting
-            Prism.highlightElement(codeElement);
-        }
-
-        // Function to fix current code
-        async function fixCurrentCode() {
-            const activeTab = document.querySelector('.tab.active');
-            if (!activeTab) {
-                showMessage('No active tab to fix code', 'error');
-                return;
-            }
-            
-            const tabId = activeTab.dataset.tabId;
-            if (!tabId || !tabs.has(tabId)) {
-                showMessage('Cannot find active tab data', 'error');
-                return;
-            }
-            
-            await fixCode(tabId);
-        }
-
-        // Function to get appropriate file icon
-        function getFileIcon(fileName) {
-            const ext = fileName.split('.').pop().toLowerCase();
-            const iconMap = {
-                'py': '🐍',
-                'js': '📜',
-                'html': '🌐',
-                'css': '🎨',
-                'json': '📋',
-                'txt': '📄',
-                'md': '📝'
-            };
-            return iconMap[ext] || '📄';
-        }
-
-        // Function to show tab
-        function showTab(tabId) {
-            // Hide all tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.style.display = 'none';
-            });
-            
-            // Show selected tab
-            const tab = document.querySelector(`.tab[data-tab-id="${tabId}"]`);
-            const content = document.getElementById(tabId);
-            if (tab && content) {
-                tab.classList.add('active');
-                content.style.display = 'block';
-            }
-        }
-
-        // Function to close tab
-        function closeTab(tabId) {
-            const tab = tabs.get(tabId);
-            if (tab) {
-                // Remove tab elements
-                const contentEl = document.getElementById(tabId);
-                if (contentEl) {
-                    contentEl.previousElementSibling.remove(); // Remove header
-                    contentEl.remove(); // Remove content
+            // Update capability badges
+            Object.entries(capabilities).forEach(([capability, isCapable]) => {
+                const element = document.getElementById(capability);
+                if (element) {
+                    element.classList.toggle('active', isCapable);
                 }
-                tabs.delete(tabId);
-            }
+            });
         }
 
-        // Function to escape HTML
-        function escapeHtml(unsafe) {
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        // Function to generate code
-        async function generateCode() {
-            const codeInput = document.getElementById('codeInput');
-            const prompt = codeInput.value.trim();
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const message = userInput.value.trim();
             
-            if (!prompt) {
-                showMessage('Please enter a code generation prompt', 'error');
-                return;
-            }
-
+            if (!message && !currentImageData) return;
+            
             const model = document.getElementById('modelSelect').value;
             if (!model) {
                 showMessage('Please select a model first', 'error');
                 return;
             }
 
+            if (message) {
+                addMessageToChat('user', message);
+            }
+            
+            if (currentImageData) {
+                const imgElement = document.createElement('img');
+                imgElement.src = document.getElementById('chatImagePreview').src;
+                imgElement.className = 'max-h-48 rounded-lg mt-2';
+                const lastMessage = document.getElementById('chatMessages').lastElementChild;
+                if (lastMessage) {
+                    lastMessage.appendChild(imgElement);
+                }
+            }
+
+            userInput.value = '';
             showThinking(true);
 
             try {
@@ -1120,8 +813,8 @@ function showMessage(message, type = 'info') {
                     },
                     body: JSON.stringify({
                         model: model,
-                        prompt: prompt,
-                        type: 'code'
+                        prompt: message,
+                        image: currentImageData
                     })
                 });
 
@@ -1130,373 +823,174 @@ function showMessage(message, type = 'info') {
                 }
 
                 const data = await response.json();
+                const processedContent = processMessageContent(data.response);
+                addMessageToChat('assistant', processedContent);
                 
-                // Parse the response to separate multiple files
-                const files = parseGeneratedCode(data.response);
-                
-                // Save each file to the generated_code directory
-                for (const file of files) {
-                    await fetch(window.location.origin + '/save_code', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            fileName: file.name,
-                            content: file.content
-                        })
-                    });
-                    
-                    // Add new tab for the file
-                    addNewTab(file.name, file.content);
+                if (currentImageData) {
+                    removeImageFromChat();
                 }
-                
-                // Refresh file list
-                await loadGeneratedFiles();
-                
-                showMessage('Code generated and saved successfully!', 'success');
             } catch (error) {
                 console.error('Error:', error);
-                showMessage('Error generating code: ' + error.message, 'error');
+                showMessage('Error sending message: ' + error.message, 'error');
             } finally {
                 showThinking(false);
             }
         }
 
-        // Function to parse generated code into multiple files
-        function parseGeneratedCode(response) {
-            const files = [];
-            let currentFile = null;
-            let currentContent = [];
-            
-            // Split response into lines
-            const lines = response.split('\n');
-            
-            for (let line of lines) {
-                // Check for file markers like "```python", "```html", etc.
-                const fileMarker = line.match(/^```(?:\w+)?\n([\s\S]*?)\n```/);
-                if (fileMarker) {
-                    // If we were collecting content for a previous file, save it
-                    if (currentFile) {
-                        files.push({
-                            name: currentFile,
-                            content: currentContent.join('\n')
-                        });
-                    }
-                    // Start new file
-                    const ext = fileMarker[1];
-                    currentFile = `generated_${files.length + 1}.${ext}`;
-                    currentContent = [];
-                    continue;
-                }
-                
-                // Check for end of file marker
-                if (line === '```') {
-                    if (currentFile) {
-                        files.push({
-                            name: currentFile,
-                            content: currentContent.join('\n')
-                        });
-                        currentFile = null;
-                        currentContent = [];
-                    }
-                    continue;
-                }
-                
-                // If we're collecting content for a file, add the line
-                if (currentFile) {
-                    currentContent.push(line);
-                }
-            }
-            
-            // If no file markers were found, create a single .txt file
-            if (files.length === 0) {
-                files.push({
-                    name: 'generated_code.txt',
-                    content: response
-                });
-            }
-            
-            return files;
+        function addMessageToChat(role, content) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role} bg-gray-700 p-2 rounded`;
+            messageDiv.textContent = content;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Function to save all open files
-        async function saveAllFiles() {
-            const promises = [];
-            for (const [tabId, tab] of tabs.entries()) {
-                if (tab && tab.content) {
-                    promises.push(saveToProject(tabId));
-                }
+        function processMessageContent(content) {
+            const codeBlocks = content.match(/```[\s\S]*?```/g) || [];
+            if (codeBlocks.length > 0) {
+                showCodeDisplay(codeBlocks);
             }
-            
-            try {
-                await Promise.all(promises);
-                showMessage('All files saved successfully!', 'success');
-            } catch (error) {
-                showMessage('Error saving some files. Check console for details.', 'error');
-                console.error('Save all error:', error);
-            }
+            return content.replace(/```[\s\S]*?```/g, ''); // Remove code blocks from chat
         }
 
-        // Function to organize files by type
-        function organizeFiles() {
-            const files = Array.from(tabs.values());
-            const filesByType = {};
+        function showCodeDisplay(codeBlocks) {
+            const codeSection = document.getElementById('codeDisplaySection');
+            const tabsContainer = codeSection.querySelector('.code-tabs');
+            const contentsContainer = codeSection.querySelector('.code-contents');
             
-            files.forEach(file => {
-                const ext = file.fileName.split('.').pop().toLowerCase();
-                if (!filesByType[ext]) {
-                    filesByType[ext] = [];
-                }
-                filesByType[ext].push(file);
+            // Clear previous content
+            tabsContainer.innerHTML = '';
+            contentsContainer.innerHTML = '';
+            
+            codeBlocks.forEach((block, index) => {
+                // Extract language and code
+                const match = block.match(/```(\w+)?\n([\s\S]*?)```/);
+                const language = match[1] || 'text';
+                const code = match[2].trim();
+                
+                // Create tab
+                const tab = document.createElement('div');
+                tab.className = `code-tab ${index === 0 ? 'active' : ''}`;
+                tab.textContent = `${language.charAt(0).toUpperCase() + language.slice(1)} ${index + 1}`;
+                tab.onclick = () => switchCodeTab(index);
+                tabsContainer.appendChild(tab);
+                
+                // Create content
+                const content = document.createElement('div');
+                content.className = `code-content ${index === 0 ? 'active' : ''}`;
+                content.innerHTML = `
+                    <div class="code-header">
+                        <h3>${language.toUpperCase()} Code</h3>
+                        <button class="copy-button" onclick="copyCode(this, ${index})">Copy</button>
+                    </div>
+                    <pre><code class="language-${language}">${escapeHtml(code)}</code></pre>
+                `;
+                contentsContainer.appendChild(content);
             });
             
-            // Create directories if they don't exist
-            fetch(window.location.origin + '/create_directories', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ types: Object.keys(filesByType) })
+            codeSection.classList.add('active');
+        }
+
+        function switchCodeTab(index) {
+            const tabs = document.querySelectorAll('.code-tab');
+            const contents = document.querySelectorAll('.code-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            tabs[index].classList.add('active');
+            contents[index].classList.add('active');
+        }
+
+        function copyCode(button, index) {
+            const codeElement = document.querySelectorAll('.code-content')[index].querySelector('code');
+            const text = codeElement.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                    button.classList.remove('copied');
+                }, 2000);
             });
-            
-            return filesByType;
         }
 
-        // Function to check if file exists
-        async function checkFileExists(fileName) {
-            try {
-                const response = await fetch(window.location.origin + '/check_file', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ fileName })
-                });
-                const data = await response.json();
-                return data.exists;
-            } catch (error) {
-                console.error('Error checking file:', error);
-                return false;
-            }
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
-        // Function to load generated files
-        async function loadGeneratedFiles() {
-            try {
-                const response = await fetch(window.location.origin + '/list_generated_files');
-                const data = await response.json();
-                
-                if (!data.files) {
-                    throw new Error('No files data received');
-                }
-                
-                // Clear existing file list
-                const fileList = document.getElementById('fileList');
-                fileList.innerHTML = '';
-                
-                if (data.files.length === 0) {
-                    fileList.innerHTML = `
-                        <div class="text-gray-400 text-center py-4">
-                            No files yet. Generate or save some code to see files here!
-                        </div>
-                    `;
-                    return;
-                }
-                
-                // Sort files by type and name
-                const sortedFiles = data.files.sort((a, b) => {
-                    if (a.type !== b.type) {
-                        return a.type.localeCompare(b.type);
+        function handleChatImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImageData = e.target.result.split(',')[1]; // Store base64 data without prefix
+                    const previewContainer = document.getElementById('imagePreviewContainer');
+                    const removeBtn = document.getElementById('removeImageBtn');
+                    
+                    // Clear existing preview
+                    previewContainer.innerHTML = '';
+                    
+                    // Create new preview elements
+                    const previewDiv = document.createElement('div');
+                    previewDiv.id = 'imagePreviewInChat';
+                    previewDiv.className = 'mt-2';
+                    
+                    const previewImg = document.createElement('img');
+                    previewImg.id = 'chatImagePreview';
+                    previewImg.className = 'max-h-48 rounded-lg';
+                    previewImg.src = e.target.result;
+                    
+                    previewDiv.appendChild(previewImg);
+                    previewContainer.appendChild(previewDiv);
+                    
+                    // Show remove button
+                    if (removeBtn) {
+                        removeBtn.classList.remove('hidden');
                     }
-                    return a.name.localeCompare(b.name);
-                });
-                
-                // Add each file to the list
-                for (const file of sortedFiles) {
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'file-item';
-                    fileItem.onclick = () => openFile(file.name);
-                    
-                    // Format file size
-                    const size = file.size < 1024 
-                        ? `${file.size} B`
-                        : `${(file.size / 1024).toFixed(1)} KB`;
-                    
-                    fileItem.innerHTML = `
-                        <span class="file-icon">${getFileIcon(file.name)}</span>
-                        <span class="file-name">${file.name}</span>
-                        <span class="file-type">${file.type}</span>
-                        <span class="file-size">${size}</span>
-                    `;
-                    
-                    fileList.appendChild(fileItem);
-                }
-            } catch (error) {
-                console.error('Error loading files:', error);
-                showMessage('Error loading files: ' + error.message, 'error');
+                };
+                reader.readAsDataURL(file);
             }
         }
 
-        // Function to open a file
-        async function openFile(fileName) {
-            try {
-                const response = await fetch(window.location.origin + '/get_generated_file_content', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ fileName: fileName })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Failed to load file: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                addNewTab(fileName, data.content);
-            } catch (error) {
-                console.error('Error opening file:', error);
-                showMessage('Error opening file: ' + error.message, 'error');
-            }
-        }
-
-        // Function to refresh the file list manually
-        async function refreshFileList() {
-            await loadGeneratedFiles();
-        }
-
-        // Add refresh button to the file list section
-        const fileListHeader = document.querySelector('#fileList').parentElement.querySelector('h2');
-        const refreshButton = document.createElement('button');
-        refreshButton.innerHTML = '↻';
-        refreshButton.className = 'ml-2 px-2 py-1 bg-gray-600 hover:bg-gray-500 rounded text-white';
-        refreshButton.title = 'Refresh file list';
-        refreshButton.onclick = refreshFileList;
-        fileListHeader.appendChild(refreshButton);
-
-        // Update the save functions to refresh the file list after saving
-        async function saveToProject(tabId) {
-            if (!tabs.has(tabId)) {
-                console.error('Tab not found:', tabId);
-                return;
-            }
-
-            const tab = tabs.get(tabId);
-            const fileName = tab.fileName;
-
-            // Check if file exists
-            if (await checkFileExists(fileName)) {
-                const overwrite = confirm(`File ${fileName} already exists. Do you want to overwrite it?`);
-                if (!overwrite) {
-                    return;
-                }
-            }
-
-            try {
-                const response = await fetch(window.location.origin + '/save_code', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        fileName: fileName,
-                        code: tab.editor.getValue()
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Failed to save file');
-                }
-
-                showMessage(`Saved ${fileName} successfully`, 'success');
-                await refreshFileList(); // Refresh the file list after saving
-            } catch (error) {
-                console.error('Save error:', error);
-                showMessage('Error saving file: ' + error.message, 'error');
-            }
-        }
-
-        // Function to extract code from AI response
-        function extractCodeFromResponse(response) {
-            // Match code between triple backticks
-            const codeMatch = response.match(/```(?:\w+)?\n([\s\S]*?)```/);
-            if (codeMatch) {
-                // Return the code without the language identifier
-                return codeMatch[1].trim();
+        function removeImageFromChat() {
+            currentImageData = null;
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const removeBtn = document.getElementById('removeImageBtn');
+            const imageUpload = document.getElementById('chatImageUpload');
+            
+            // Clear preview container
+            if (previewContainer) {
+                previewContainer.innerHTML = '';
             }
             
-            // If no code blocks found, try to find indented code
-            const lines = response.split('\n');
-            let codeLines = [];
-            let inCode = false;
-            
-            for (const line of lines) {
-                if (line.startsWith('    ') || line.startsWith('\t')) {
-                    inCode = true;
-                    codeLines.push(line.replace(/^(    |\t)/, ''));
-                } else if (inCode && line.trim() === '') {
-                    codeLines.push('');
-                } else {
-                    inCode = false;
-                }
+            // Hide remove button
+            if (removeBtn) {
+                removeBtn.classList.add('hidden');
             }
             
-            if (codeLines.length > 0) {
-                return codeLines.join('\n').trim();
-            }
-            
-            // If no code blocks found, return null
-            return null;
-        }
-
-        // Command line functionality
-        async function handleCommandInput(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                const cmdInput = document.getElementById('cmdInput');
-                const command = cmdInput.value.trim();
-                if (!command) return;
-
-                const terminalOutput = document.getElementById('terminalOutput');
-                const cmdLine = document.createElement('div');
-                cmdLine.className = 'text-white';
-                cmdLine.textContent = `> ${command}`;
-                terminalOutput.appendChild(cmdLine);
-
-                try {
-                    const response = await fetch(`${window.location.origin}/execute`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ command: command })
-                    });
-
-                    const data = await response.json();
-                    
-                    if (!response.ok) {
-                        throw new Error(data.error || 'Command execution failed');
-                    }
-
-                    const output = document.createElement('div');
-                    output.className = 'text-gray-300 whitespace-pre-wrap';
-                    output.textContent = data.output || '';
-                    terminalOutput.appendChild(output);
-                    
-                    // Auto-scroll to bottom
-                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
-                } catch (error) {
-                    console.error('Error executing command:', error);
-                    const errorOutput = document.createElement('div');
-                    errorOutput.className = 'text-red-500';
-                    errorOutput.textContent = error.message;
-                    terminalOutput.appendChild(errorOutput);
-                }
-
-                cmdInput.value = '';
+            // Clear file input
+            if (imageUpload) {
+                imageUpload.value = '';
             }
         }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadModels();
+            checkModelCapabilities();
+            
+            // Add change event listener to model select
+            const modelSelect = document.getElementById('modelSelect');
+            modelSelect.addEventListener('change', checkModelCapabilities);
+        });
     </script>
 </body>
 </html>
